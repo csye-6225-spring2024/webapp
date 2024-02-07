@@ -69,7 +69,6 @@ app.get('/healthz', healthCheck);
 
 //app.use(bodyParser.json());
   
-
 // Middleware to handle invalid methods for non-existent endpoints
 app.use('/', (req, res, next) => {
     const allowedPaths = ['/v1/user', '/v1/user/self'];

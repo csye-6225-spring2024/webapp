@@ -11,4 +11,4 @@ Steps to Build the Application:
 1. run "npm i" or "npm install" -- to install dependencies
 2. run "npm i sequelize mysql2 body-parser express -- to install additional packages
 3. run "npm start" -- to run the application
------------------------------
+-------------------------
