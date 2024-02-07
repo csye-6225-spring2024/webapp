@@ -72,13 +72,10 @@ app.get('/healthz', healthCheck);
 
 // Middleware to handle invalid methods for non-existent endpoints
 app.use('/', (req, res, next) => {
-    // Check if the requested path is /v1/user or /v1/user/self
     const allowedPaths = ['/v1/user', '/v1/user/self'];
     if (allowedPaths.includes(req.path)) {
-        // If the requested path is allowed, pass control to the next middleware
         next();
     } else {
-        // If the requested path is not allowed, send a 404 error response
         res.status(404).send();
     }
 });
