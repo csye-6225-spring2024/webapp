@@ -53,6 +53,27 @@ const isAlphaString = (str) => {
 // }
 
 
+//   function parseJSONWithCatch(jsonString) {
+//     try {
+//         // Attempt to parse the JSON string if it's a string
+//         if (typeof jsonString === 'string') {
+//             const parsedJSON = JSON.parse(jsonString);
+//             return parsedJSON;
+//         } else if (typeof jsonString === 'object') {
+//             // Return the object as is if it's already an object
+//             return jsonString;
+//         } else {
+//             // Return null for other types
+//             return null;
+//         }
+//     } catch (error) {
+//         // Handle JSON parsing errors
+//         console.error("Error parsing JSON:", error.message);
+//         return null;
+//     }
+// }
+
+
 // Adding User to database
 const addUser = async (req, res) => {
     // Check if the request method is POST
@@ -204,8 +225,8 @@ const getUser = async (req, res) => {
 const updateUser = async (req, res) => {
     // Check if the request body is empty
     if (Object.keys(req.body).length === 0) {
-        res.status(204).send("Request body is empty.");
-        return;
+        res.status(400).send("Request body is empty.");
+
     }
     
     // Ensure only valid keys are present in the request body
@@ -214,6 +235,12 @@ const updateUser = async (req, res) => {
     if (invalidFields.length > 0) {
         res.status(400).send("Invalid fields in request body.");
         return;
+    } 
+
+    if (!req.headers.authorization) {
+      res.status(401).send("Cannot authorize");
+      return;
+  }
     }
 
     const isDBConnected = await dbConnectionCheck();
@@ -221,6 +248,7 @@ const updateUser = async (req, res) => {
         res.status(503).send("Database Connectivity Error");
         return;
     }
+
 
     // Grab the encoded value, format: bearer <Token>, need to extract only <token>
     var encoded = req.headers.authorization.split(' ')[1];
@@ -269,8 +297,6 @@ const updateUser = async (req, res) => {
             const salt = await bcrypt.genSalt(10);
             updates.password = await bcrypt.hash(req.body.password, salt);
         }
-
-
 
         if (Object.keys(updates).length === 0) {
             res.status(400).send("No valid fields provided for update.");

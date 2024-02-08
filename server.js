@@ -83,17 +83,9 @@ app.use(bodyParser.json());
 app.use('/v1/user', router); 
 
 // Synchronize the model with the database
-sequelize
-  .query(`CREATE DATABASE IF NOT EXISTS ${process.env.DATABASE}`)
-  .then(() => sequelize.query(`USE ${process.env.DATABASE}`))
-  .then(() => sequelize.sync({ alter: true })) // Update existing tables
-  .then(() => {
-    const PORT = process.env.PORT || 8080;
-    app.listen(PORT, () => console.log(`Server listening on ${PORT}`));
-  })
-  .catch((error) => {
-    console.error('Error synchronizing database:', error);
-  });
+sequelize.sync().then(() => {
+  const PORT = 8080;
+  app.listen(PORT, () => console.log(`Server listening on ${PORT}`));
+});
 
-
-export default app; 
+export default app;

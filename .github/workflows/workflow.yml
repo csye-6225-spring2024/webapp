@@ -23,3 +23,6 @@ jobs:
     
     - name: Print Hello, world!
       run: echo "Hello, world!"
+
+    - name: Run Tests
+      run: npm test
