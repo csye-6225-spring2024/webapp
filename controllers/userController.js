@@ -1,318 +1,211 @@
-import bcrypt from 'bcrypt';
-import User from '../models/userModel.js';
-import { dbConnection } from './healthController.js';
-import sequelize from '../config/dbConfig.js';
-
-// Validators
+import { User } from "../models/healthzModel.js";
+import nameValidator from 'validator';
 import emailValidator from 'email-validator';
-import passwordValidator from 'password-validator';
-import nameValidator from 'validator'; 
-const estOptions = { timeZone: 'America/New_York' };
-
-const passwdValidator = new passwordValidator();
-export { emailValidator, passwdValidator, nameValidator }; 
-passwdValidator
-  .is()
-  .min(5) // Minimum length 5
-  .is()
-  .max(20); // Maximum length 20
-  
-  const dbConnectionCheck = async () => {
-    try {
-        await sequelize.authenticate();
-        return true; // Database connection successful
-    } catch (error) {
-        console.error('Database Connectivity Error:', error);
-        return false; // Database connection failed
-    }
-};
-
-// Function to validate if a string contains only letters (no digits)
-const isAlphaString = (str) => {
-    return nameValidator.isAlpha(str);
-  };
-
-//   function parseJSONWithCatch(jsonString) {
-//     try {
-//         // Attempt to parse the JSON string if it's a string
-//         if (typeof jsonString === 'string') {
-//             const parsedJSON = JSON.parse(jsonString);
-//             return parsedJSON;
-//         } else if (typeof jsonString === 'object') {
-//             // Return the object as is if it's already an object
-//             return jsonString;
-//         } else {
-//             // Return null for other types
-//             return null;
-//         }
-//     } catch (error) {
-//         // Handle JSON parsing errors
-//         console.error("Error parsing JSON:", error.message);
-//         return null;
-//     }
-// }
-
-
-//   function parseJSONWithCatch(jsonString) {
-//     try {
-//         // Attempt to parse the JSON string if it's a string
-//         if (typeof jsonString === 'string') {
-//             const parsedJSON = JSON.parse(jsonString);
-//             return parsedJSON;
-//         } else if (typeof jsonString === 'object') {
-//             // Return the object as is if it's already an object
-//             return jsonString;
-//         } else {
-//             // Return null for other types
-//             return null;
-//         }
-//     } catch (error) {
-//         // Handle JSON parsing errors
-//         console.error("Error parsing JSON:", error.message);
-//         return null;
-//     }
-// }
-
-
-// Adding User to database
-const addUser = async (req, res) => {
-    // Check if the request method is POST
-    if (req.method === 'POST') {
-        // Check if the authorization header is present
-        if (req.headers.authorization) {
-            // Send an error response indicating authorization is not supported for this method
-            res.status(405).send("Authorization is not supported for this method.");
-            return;
-        }
-
-        // if (Object.keys(req.body).length === 0) {
-        //     return res.status(400).json({ message: "Empty / Invalid payload not allowed" });
-        //   }
-        
-        // Check if the request body is empty
-        if (Object.keys(req.body).length === 0) {
-            res.status(204).send("Request body is empty.");
-            return;
-        }
-      
-        const allowedFields = ['first_name', 'last_name', 'username', 'password', 'account_created', 'account_updated'];
-      
-        // Check for any additional fields in the request body
-        const extraFields = Object.keys(req.body).filter(
-            (field) => !allowedFields.includes(field)
-        );
-      
-        if (extraFields.length > 0) {
-            res.status(400).send("Additional fields are not allowed.");
-            return;
-        }
-      
-        // Validating first_name and last_name format
-        if (
-            !isAlphaString(req.body.first_name) ||
-            !isAlphaString(req.body.last_name)
-        ) {
-            res.status(400).send("Invalid format for first_name or last_name.");
-            return;
-        } else {
-            const salt = await bcrypt.genSalt(10);
-            const hashPassword = await bcrypt.hash(req.body.password, salt);
-        
-            const details = {
-                username: req.body.username,
-                last_name: req.body.last_name,
-                first_name: req.body.first_name,
-                password: hashPassword,
-            };
-        
-            if (
-                !emailValidator.validate(`${req.body.username}`) ||
-                !passwdValidator.validate(`${req.body.password}`)
-            ) {
-                res.status(400).send("Invalid email or password format.");
-                return;
-            }
-            
-            // Check database connection before proceeding
-            const isDBConnected = await dbConnectionCheck();
-            if (!isDBConnected) {
-                res.status(503).send("Database Connectivity Error");
-                return;
-            }
-                
-            const findUser = await User.findOne({
-                where: { username: `${req.body.username}` },
-            });
-
-            if (findUser === null) {
-                const user = await User.create(details);
-                const userInput = {
-                    id: user.id,
-                    username: user.username,
-                    first_name: user.first_name,
-                    last_name: user.last_name,
-                    account_created: user.account_created,
-                    account_updated: user.account_updated,
-                };
-                res.status(201).json(userInput);
-            } else {
-                res.status(400).send("User already exists.");
-            }
-        }
-    } else {       
-        res.status(405).send("Method Not Allowed");
-    }
-};
-
-
-// Fetching user details following basic authentication.
-const getUser = async (req, res) => {
-    // Check if the request method is GET
-    if (req.method === 'GET') {
-      // Check if the request body is not empty
-      if (Object.keys(req.body).length > 0) {
-        res.status(400).send("Request body should be empty for GET requests.");
-        return;
-      }
-    }
-
-    const isDBConnected = await dbConnectionCheck();
-            if (!isDBConnected) {
-                res.status(503).send("Database Connectivity Error");
-                return;
-            }
-  
-    // Check if the authorization header is undefined
+ 
+// Function to get user information
+const getUserInfo = async (req, res) => {
+  try {
     if (req.headers.authorization === undefined) {
-      res.status(403).send("Authorization header is missing.");
-    } else {
-      // Retrieve the encoded value in the format of 'basic <Token>' and extract only the <token>.
-      var encoded = req.headers.authorization.split(' ')[1];
-      // Decode it utilizing base64
-      var decoded = Buffer.from(encoded, 'base64').toString();
-      var username = decoded.split(':')[0];
-      var password = decoded.split(':')[1];
-
-  
-      // Verify if the provided username corresponds to the records in our database.
-      const findUser = await User.findOne({
-        where: { username: username },
-      });
-
-  
-      if (findUser !== null) {
-        if (await bcrypt.compare(password, findUser.password)) {
-          let userInput = {
-            id: findUser.id,
-            username: findUser.username,
-            first_name: findUser.first_name,
-            last_name: findUser.last_name,
-            account_created: findUser.account_created,
-            account_updated: findUser.account_updated,
-          };
-  
-          res.status(200).json(userInput);
-        } else {
-          res.status(401).send("Invalid password.");
-        }
-      } else {
-        // User not found in the database
-        res.status(404).send("User not found.");
-      }
+      // res.status(403).send("Authorization header is missing.");
+      res.status(403).json({ message: "Authorization header is missing." });
     }
-};
-
-const updateUser = async (req, res) => {
-    // Check if the request body is empty
-    if (Object.keys(req.body).length === 0) {
-        res.status(400).send("Request body is empty.");
-
-    }
-    
-    // Ensure only valid keys are present in the request body
-    const allowedFields = ['first_name', 'last_name', 'password'];
-    const invalidFields = Object.keys(req.body).filter(field => !allowedFields.includes(field));
-    if (invalidFields.length > 0) {
-        res.status(400).send("Invalid fields in request body.");
-        return;
-    } 
-
-    if (!req.headers.authorization) {
-      res.status(401).send("Cannot authorize");
-      return;
-  }
-    }
-
-    const isDBConnected = await dbConnectionCheck();
-    if (!isDBConnected) {
-        res.status(503).send("Database Connectivity Error");
-        return;
-    }
-
-
-    // Grab the encoded value, format: bearer <Token>, need to extract only <token>
-    var encoded = req.headers.authorization.split(' ')[1];
-    // Decode it using base64
-    var decoded = Buffer.from(encoded, 'base64').toString();
-    var username = decoded.split(':')[0];
-    var password = decoded.split(':')[1];
-
-    // Check if the passed username and password match with the values in our database.
-    const findUser = await User.findOne({
-        where: { username: username },
+    // Retrieve user information (excluding password)
+    const user = await User.findByPk(req.user.id, {
+      attributes: { exclude: ["password"] },
     });
-
-    if (!findUser) {
-        // User not found
-        res.status(404).send("User not found.");
-        return;
+    res.json(user);
+  } catch (error) {
+    console.error("Error retrieving user information:", error);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+ 
+// Function to create a new user
+const createUser = async (req, res, next) => {
+  try{
+  if (Object.keys(req.query).length > 0) {
+    return res.status(400).json({ message: "Query parameters are not allowed" });
+  }
+ 
+  // Check for empty request body
+  if (Object.keys(req.body).length === 0) {
+    return res.status(400).json({ message: "Empty / Invalid payload not allowed" });
+  }
+ 
+   // Check if authorization headers are present
+   if (req.headers.authorization) {
+    return res.status(400).json({ message: "Authorization headers are not allowed for creating a user" });
+  }
+ 
+  const allowedAttributes = ['first_name', 'last_name', 'id', 'password', 'username', 'account_created', 'account_updated'];
+  const receivedAttributes = Object.keys(req.body);
+ 
+ 
+const { first_name, last_name, password, username } = req.body;
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+ 
+    if (!first_name || !last_name || !password || !username) {
+      return res.status(400).json({ message: "Missing required fields" });
+    }
+     // Check if email matches the email format
+ 
+  if (!emailValidator.validate(`${req.body.username}`)) {
+    return res.status(400).json({ message: "Invalid email address" });
+    
+}
+ 
+    //  Check for extra attributes
+  const extraAttributes = receivedAttributes.filter(attr => !allowedAttributes.includes(attr));
+  if (extraAttributes.length > 0) {
+    return res.status(400).json({ message: `Extra attributes are not allowed: ${extraAttributes.join(', ')}` });
+  }
+    next();
+  }
+  catch (error) {
+    console.error("Error in createUser middleware:", error);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+ 
+ 
+ 
+const createUserPost = async (req, res) => {
+  const { first_name, last_name, password, username } = req.body;
+ 
+  const existingUser = await User.findOne({ where: { username } });
+    if (existingUser) {
+      return res
+        .status(400)
+        .json({ message: "User with this email already exists" });
+    }
+    const newUser = await User.create({
+      first_name,
+      last_name,
+      password,
+      username,
+    });
+ 
+    // Return the created user
+    res.status(201).json({
+      id: newUser.id,
+      first_name: newUser.first_name,
+      last_name: newUser.last_name,
+      username: newUser.username,
+      account_created: new Date(),
+      account_updated: new Date(),
+    });
+};
+ 
+const isAlphaString = (str) => {
+  return nameValidator.isAlpha(str);
+};
+ 
+// Function to check update user information
+ 
+const updateUserCheck = async (req, res, next) => {
+  try{
+  if (Object.keys(req.query).length > 0) {
+    return res.status(400).json({ message: "Query parameters are not allowed" });
+  }
+  // Check for empty request body
+  if (Object.keys(req.body).length === 0) {
+    return res.status(400).json({ message: "Empty / Invalid payload not allowed" });
+  }
+ 
+   const { first_name, last_name, password } = req.body;
+   if (
+    !isAlphaString(req.body.first_name) ||
+    !isAlphaString(req.body.last_name)
+) {
+  return res.status(400).json({ message: "Missing required fields" });
+    
+}
+  // Check if the request body is empty
+  if (!first_name && !last_name && !password) {
+    return res.status(400).json({ message: "Missing required fields" });
+  }
+ 
+  const unauthorizedFields = Object.keys(req.body).filter(
+    (field) => !["first_name", "last_name", "password"].includes(field)
+  );
+  if (unauthorizedFields.length > 0) {
+    return res.status(400).json({
+      message: `User cannot update- ${unauthorizedFields.join(
+        ", "
+      )}`,
+    });
+  }
+  if (req.headers.authorization === undefined) {
+    return res.status(403).json({ message: "Authorization header is missing." });
+  }
+  next();
+}
+  catch (error) {
+    console.error("Error in createUser middleware:", error);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+// Function to update user information
+const updateUser = async (req, res) => {
+  
+  
+  const { first_name, last_name, password } = req.body;
+  const userId = req.user.id;
+ 
+  try {
+    // Find the user by ID
+    const user = await User.findByPk(userId);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    // Check if the user is updating their own account
+    if (user.id !== userId) {
+      return res
+        .status(403)
+        .json({ message: "User Can only update his/her own account only" });
     }
     
-    if (await bcrypt.compare(password, findUser.password)) {
-        // Validating first_name and last_name format
-        if (req.body.first_name && !isAlphaString(req.body.first_name)) {
-            res.status(400).send("Invalid format for first_name.");
-            return;
-        }
-        if (req.body.last_name && !isAlphaString(req.body.last_name)) {
-            res.status(400).send("Invalid format for last_name.");
-            return;
-        }
-
-        const updates = {};
-
-        if (req.body.first_name) {
-            updates.first_name = req.body.first_name;
-        }
-
-        if (req.body.last_name) {
-            updates.last_name = req.body.last_name;
-        }
-
-        if (req.body.password) {
-            if (!passwdValidator.validate(req.body.password)) {
-                res.status(400).send("Invalid password format.");
-                return;
-            }
-            const salt = await bcrypt.genSalt(10);
-            updates.password = await bcrypt.hash(req.body.password, salt);
-        }
-
-        if (Object.keys(updates).length === 0) {
-            res.status(400).send("No valid fields provided for update.");
-            return;
-        }
-
-        updates.account_updated = new Date();
-
-        await findUser.update(updates);
-
-        res.status(204).send();
-    } else {
-        res.status(401).send("Invalid password.");
+    let changesMade = false;
+ 
+    if (password !== undefined && password !== user.password) {
+      user.password = password;
+      changesMade = true;
     }
+ 
+    if (first_name !== undefined && first_name !== user.first_name) {
+      user.first_name = first_name;
+      changesMade = true;
+    }
+    if (last_name !== undefined && last_name !== user.last_name) {
+      user.last_name = last_name;
+      changesMade = true;
+    }
+ 
+    // Update the account_updated field only if changes were made
+    if (changesMade) {
+      user.account_updated = new Date();
+      await user.save();
+    }
+ 
+    const updatedUser = await User.findByPk(userId, {
+      attributes: { exclude: ["password", "createdAt", "updatedAt"] },
+    });
+ 
+    if (changesMade) {
+       return res.status(204).send();
+    } else {
+      return res.status(204).send();
+    }
+  } catch (error) {
+    if (error.name === "SequelizeValidationError") {
+      const errorMessage = error.errors.map((err) => err.message).join(", ");
+      return res.status(400).json({ message: errorMessage });
+    } else {
+      console.error("Error updating user:", error);
+      return res.status(500).json({ message: "Internal Server Error" });
+    }
+  }
 };
-
-
-export { addUser, getUser, updateUser };
-
+ 
+ 
+export { createUser, getUserInfo, updateUser, createUserPost, updateUserCheck };

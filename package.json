@@ -1,18 +1,19 @@
 {
   "type": "module",
-  "name": "untitled-folder",
+  "name": "Cloud_Assignment",
   "version": "1.0.0",
   "main": "server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 0",
+    "test": "mocha --exit --recursive",
     "start": "node server.js"
   },
-  "author": "Anusha Senthilnathan",
+  "author": "",
   "license": "ISC",
   "dependencies": {
     "assert": "^2.1.0",
     "bcrypt": "^5.1.1",
     "body-parser": "^1.20.2",
+    "chai": "^5.1.0",
     "dotenv": "^16.4.1",
     "email-validator": "^2.0.4",
     "emailvalidator": "^0.1.3",
