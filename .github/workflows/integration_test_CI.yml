@@ -15,13 +15,13 @@ jobs:
       mysql:
         image: mysql:latest
         env:
-          MYSQL_ROOT_PASSWORD: ${{ secrets.MYSQL_ROOT_PASSWORD }}
-          MYSQL_DATABASE: ${{ secrets.MYSQL_DATABASE }}
-          MYSQL_USER: ${{ secrets.MYSQL_USER }}
-          MYSQL_PASSWORD: ${{ secrets.MYSQL_PASSWORD }}
-          MYSQL_HOST: ${{ secrets.MYSQL_HOST }}
-          MYSQL_PORT: ${{ secrets.MYSQL_PORT }}
-          MYSQL_DIALECT: ${{ secrets.MYSQL_DIALECT }}
+          echo "MYSQL_ROOT_PASSWORD: ${{ secrets.MYSQL_ROOT_PASSWORD }}"
+          echo "MYSQL_DATABASE: ${{ secrets.MYSQL_DATABASE }}"
+          echo "MYSQL_USER: ${{ secrets.MYSQL_USER }}"
+          echo "MYSQL_PASSWORD: ${{ secrets.MYSQL_PASSWORD }}"
+          echo "MYSQL_HOST: ${{ secrets.MYSQL_HOST }}"
+          echo "MYSQL_PORT: ${{ secrets.MYSQL_PORT }}"
+          echo "MYSQL_DIALECT: ${{ secrets.MYSQL_DIALECT }}"
         ports:
           - 3306:3306
         options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
