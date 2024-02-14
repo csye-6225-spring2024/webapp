@@ -1,15 +1,11 @@
-import { Sequelize } from 'sequelize';
-import dotenv from 'dotenv';
-
+import dotenv from "dotenv";
 dotenv.config();
-
-const sequelize = new Sequelize({
-  host: process.env.HOST,
-  username: process.env.USERNAME,
-  password: process.env.PASSWORD,
-  database: process.env.DATABASE,
-  dialect: process.env.DIALECT
-});
-
-export default sequelize;
-
+ 
+// export dbConfig;
+export const dbConfig = {
+  HOST: process.env.HOST,
+  USER: process.env.DB_USER,
+  PASSWORD: process.env.DB_PASSWORD,
+  DB: process.env.DB,
+  dialect: process.env.DIALECT,
+};
