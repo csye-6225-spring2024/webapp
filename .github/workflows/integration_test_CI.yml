@@ -42,8 +42,6 @@ jobs:
         uses: actions/setup-node@v2
         with:
           node-version: ${{ matrix.node-version }}
- 
-      
       
       - name: Debug
         run: |
@@ -72,19 +70,6 @@ jobs:
  
       - name: Install Dependencies
         run: npm install
- 
-      # - name: Start the application
-      #   run: |
-      #       npm start &
-        
-      # - name: Wait for the application to be ready
-      #   run: |
-      #       sleep 10
-      #       until curl -s http://localhost:8080; do
-      #         sleep 5
-      #       done
-      # - name: Run npm start
-      #   run: npm start
  
       - name: Run Tests
         run: npm test
