@@ -4,14 +4,6 @@ on:
   pull_request:
     branches:
       - main
- 
-env:
-  DIALECT: ${{ secrets.DIALECT }}
-  HOST: ${{ secrets.HOST }}
-  DB_USER: ${{ secrets.DB_USER }}
-  DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
-  DB: ${{ secrets.DB }}
- 
 jobs:
   build:
     name: test-checker
@@ -25,7 +17,7 @@ jobs:
  
       - name: Install MySQL
         run: |
- 
+
           sudo systemctl start mysql
           sudo systemctl status mysql
  
@@ -45,12 +37,6 @@ jobs:
     
       - name: Set up environment variables
         run: |
-          echo "DB_USER=${{ secrets.DB_USER }}" >> $GITHUB_ENV
-          echo "DB_PASSWORD=${{ secrets.DB_PASSWORD }}" >> $GITHUB_ENV
-          echo "DB=${{ secrets.DB }}" >> $GITHUB_ENV
-          echo "MYSQL_HOST=${{ secrets.MYSQL_HOST }}" >> $GITHUB_ENV
- 
- 
           echo "DB_USER=${{ secrets.DB_USER}}" > .env
           echo "DB_PASSWORD=${{ secrets.DB_PASSWORD }}" >> .env
           echo "DB=${{ secrets.DB }}" >> .env
