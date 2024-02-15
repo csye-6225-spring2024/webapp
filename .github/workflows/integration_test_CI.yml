@@ -4,15 +4,17 @@ on:
   pull_request:
     branches:
       - main
-env:
-        DB_HOST: ${{ secrets.DB_HOST }}
-        DB_USER: ${{ secrets.DB_USER }}
-        DB_PASS: ${{ secrets.DB_PASS }}
-        DB_NAME: ${{ secrets.DB_NAME }}
-        MYSQL_DIALECT: ${ secrets.MYSQL_DIALECT}}
+ 
+# env:
+#   DIALECT: ${{ secrets.DIALECT }}
+#   HOST: ${{ secrets.HOST }}
+#   DB_USER: ${{ secrets.DB_USER }}
+#   DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+#   DB: ${{ secrets.DB }}
+ 
 jobs:
   build:
-    name: test-checkerr
+    name: test-checker
     runs-on: ubuntu-latest
       
     strategy:
@@ -23,9 +25,16 @@ jobs:
  
       - name: Install MySQL
         run: |
-          sudo apt-get update
-          sudo systemctl start mysql.service
-          sudo mysql --user=${{ secrets.DB_USER }} --password=${{ secrets.DB_PASS }} -e "CREATE DATABASE IF NOT EXISTS ${{ secrets.DB_NAME }};"
+ 
+          sudo systemctl start mysql
+          sudo systemctl status mysql
+ 
+      - name: Configure MySQL
+        run: |
+         sudo mysql -u root -p"${{ secrets.MYSQL_ROOT_PASSWORD }}" -e "CREATE DATABASE IF NOT EXISTS ${{ secrets.DB }};"
+         sudo mysql -u root -p"${{ secrets.MYSQL_ROOT_PASSWORD }}" -e "CREATE USER IF NOT EXISTS '${{ secrets.DB_USER }}'@'localhost' IDENTIFIED BY '${{ secrets.DB_PASSWORD }}';"
+         sudo mysql -u root -p"${{ secrets.MYSQL_ROOT_PASSWORD }}" -e "GRANT ALL PRIVILEGES ON ${{ secrets.DB }}.* TO '${{ secrets.DB_USER }}'@'localhost';"
+         sudo mysql -u root -p"${{ secrets.MYSQL_ROOT_PASSWORD }}" -e "FLUSH PRIVILEGES;"
  
       - uses: actions/checkout@v2
  
@@ -33,9 +42,29 @@ jobs:
         uses: actions/setup-node@v2
         with:
           node-version: ${{ matrix.node-version }}
+    
+      - name: Set up environment variables
+        run: |
+ 
+          echo "DB_USER=${{ secrets.DB_USER}}" > .env
+          echo "DB_PASSWORD=${{ secrets.DB_PASSWORD }}" >> .env
+          echo "DB=${{ secrets.DB }}" >> .env
+          echo "HOST=${{ secrets.HOST }}" >> .env
+          echo "DIALECT=${{ secrets.DIALECT }}" >> .env
  
       - name: Install Dependencies
         run: npm install
+ 
+      - name: Start the application
+        run: |
+            npm start &
+        
+      - name: Wait for the application to be ready
+        run: |
+            sleep 10
+            until curl -s http://localhost:8080; do
+              sleep 5
+            done
  
       - name: Run Tests
         run: npm test
