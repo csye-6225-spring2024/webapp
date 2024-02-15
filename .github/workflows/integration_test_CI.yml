@@ -11,7 +11,7 @@ env:
         DB_NAME: ${{ secrets.DB_NAME }}
 jobs:
   build:
-    name: test-checker
+    name: test-checkerr
     runs-on: ubuntu-latest
       
     strategy:
