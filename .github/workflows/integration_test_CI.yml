@@ -36,8 +36,5 @@ jobs:
       - name: Install Dependencies
         run: npm install
  
-      - name: Run npm Start
-        run: npm start
- 
       - name: Run Tests
         run: npm test
