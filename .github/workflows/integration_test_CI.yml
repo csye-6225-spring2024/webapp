@@ -24,7 +24,7 @@ jobs:
         run: |
           sudo apt-get update
           sudo systemctl start mysql.service
-          sudo mysql --user=${{ secrets.DB_USER }} --password=${{ secrets.DB_PASS }} -e "CREATE DATABASE IF NOT EXISTS ${DB_NAME};"
+          sudo mysql --user=${{ secrets.DB_USER }} --password=${{ secrets.DB_PASS }} -e "CREATE DATABASE IF NOT EXISTS ${{ secrets.DB_NAME }};"
  
       - uses: actions/checkout@v2
  
