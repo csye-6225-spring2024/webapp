@@ -56,3 +56,43 @@ PUT request --> /v1/user/self
 • Similarly if the provided First Name, Last Name, Password is invalid or empty -->400
 • No DB connection -->503
 • Account_updated field should be updated when the user update is successful.
+ 
+Assignment 03:
+ 
+GitHub Actions Integration Tests Workflow:
+ 
+The repository includes a GitHub Actions workflow named "test-checker" specifically designed for integration testing of the /v1/user endpoint.
+ 
+Workflow Description:
+ 
+The workflow consists of the following steps:
+ 
+• Install MySQL: Starts the MySQL service.
+• Configure MySQL: Sets up the MySQL database by creating a database, user, and granting necessary privileges.
+• Use Node.js: Sets up Node.js environment
+• Set up environment variables: Sets up environment variables required for the application to connect to the MySQL database.
+• Install Dependencies: Installs the project dependencies using npm.
+• Start the application: Starts the application by running "npm start".
+• Run Tests: Executes the integration tests defined in the "test" directory using the "npm test" command.
+ 
+Test Environment Configuration:
+ 
+The workflow utilizes secrets to securely configure the MySQL database connection. The following secrets are required:
+ 
+- MYSQL_ROOT_PASSWORD: Root password for MySQL.
+- DB_USER: Username for the MySQL database.
+- DB_PASSWORD: Password for the MySQL database user.
+- DB: Name of the MySQL database.
+- MYSQL_HOST: Hostname of the MySQL server.
+ 
+These secrets are used to create and configure the MySQL database during workflow execution. Additionally, environment variables are set both in the workflow and in a ".env" file to ensure proper configuration of the application.
+ 
+Execution Flow:
+ 
+• The workflow starts by installing and configuring MySQL to create the necessary database and user.
+• Sets Node.js environment.
+• Environment variables are configured to establish the connection between the application and MySQL database.
+• Dependencies are installed, and the application is started.
+• Integration tests are executed against the running application to validate the functionality of the "/v1/user" endpoint.
+ 
+The workflow ensures that the application interacts correctly with the MySQL database and that the "/v1/user" endpoint behaves as expected according to the specified test cases.
