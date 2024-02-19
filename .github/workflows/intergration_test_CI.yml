@@ -68,6 +68,9 @@ jobs:
       - name: Run Tests
         run: npm test
 
+      - name: Packer init
+        run: packer init
+
       # Packer formatting
       - name: Packer fmt
         run: packer fmt ./packer-config
