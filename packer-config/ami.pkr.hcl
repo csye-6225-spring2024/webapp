@@ -50,7 +50,7 @@ build {
   }
 
   provisioner "shell" {
-    script = "install_mysql.sh"
+    script = "./packer-config/install_mysql.sh"
   }
 
   // provisioner "shell" {
@@ -62,7 +62,7 @@ build {
   // }
 
   provisioner "shell" {
-     script = "install.sh"
+     script = "./packer-config/install.sh"
   }
 
 
