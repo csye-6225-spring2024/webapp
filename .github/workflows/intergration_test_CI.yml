@@ -70,9 +70,9 @@ jobs:
 
       # Packer formatting
       - name: Packer fmt
-        run: packer fmt /packer-config
+        run: packer fmt ./packer-config
 
       # Packer validation
       - name: Packer validate
-        run: packer validate /packer-config
+        run: packer validate ./packer-config
 
