@@ -69,15 +69,15 @@ jobs:
         run: npm test
 
       - name: Packer init
-        run: packer init ./ami.pck.hcl
+        run: packer init ./ami.pkr.hcl
 
       # Packer formatting
       - name: Packer fmt
-        run: packer fmt ./ami.pck.hcl
+        run: packer fmt ./ami.pkr.hcl
 
       # Packer validation
       - name: Packer validate
-        run: packer validate ./ami.pck.hcl
+        run: packer validate ./ami.pkr.hcl
       
 
 
