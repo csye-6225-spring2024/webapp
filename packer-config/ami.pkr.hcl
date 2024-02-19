@@ -19,7 +19,7 @@ variable "source_image" {
 
 variable "zone" {
   type    = string
-  default = "us-central1-a"
+  default = "us-east1-b"
 }
 
 variable "ssh_username" {
@@ -29,7 +29,7 @@ variable "ssh_username" {
 
 variable "image_name" {
   type    = string
-  default = "my-custom-image22"
+  default = "my-custom-image23"
 }
 
 source "googlecompute" "custom-image" {
@@ -50,19 +50,11 @@ build {
   }
 
   provisioner "shell" {
-    script = "./packer-config/install_mysql.sh"
+    script = "install_dependencies.sh"
   }
 
-  // provisioner "shell" {
-  //   script = "create_user.sh"
-  // }
-
-  // provisioner "shell" {
-  //   script = "install_dependencies.sh"
-  // }
-
   provisioner "shell" {
-     script = "./packer-config/install.sh"
+     script = "create_user.sh"
   }
 
 

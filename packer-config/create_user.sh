@@ -18,9 +18,6 @@
 
 
 # Install Node.js and npm
-sudo dnf module list nodejs
-sudo dnf module enable -y nodejs:20
-sudo dnf install -y npm
 
 # Create local user csye6225 and its group
 sudo groupadd csye6225
