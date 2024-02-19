@@ -69,7 +69,7 @@ jobs:
         run: npm test
 
       - name: Packer init
-        run: packer init ami.pkr.hcl
+        run: packer init ./packer-config/ami.pkr.hcl
 
       # Packer formatting
       - name: Packer fmt
