@@ -25,7 +25,7 @@ variable "zone" {
  
 variable "ssh_username" {
   type    = string
-  default = "centos"
+  default = "csye6225"
 }
  
 variable "image_name" {
