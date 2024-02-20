@@ -10,7 +10,7 @@ packer {
  
 variable "GCP_PROJECT_ID" {
   type    = string
-  default = "ancient-vortex-411817"
+  default = "learned-balm-411817"
 }
  
 variable "source_image" {
