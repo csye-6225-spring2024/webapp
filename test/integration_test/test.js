@@ -52,5 +52,5 @@ describe("User Endpoint Integration Tests", () => {
     });
     expect(getUserResponse.status).to.equal(200);
     expect(getUserResponse.data.first_name).to.equal("testnew");
-  });
+ 
 });
