@@ -101,8 +101,8 @@ jobs:
       - name: Validate Packer template
         run: packer validate packer-config/custom_image.pkr.hcl
      
-      # - name: Build custom image
-      #   run: packer build -var 'artifact_path=webapp.zip' packer-config/custom_image.pkr.hcl
+      - name: Build custom image
+        run: packer build -var 'artifact_path=webapp.zip' packer-config/custom_image.pkr.hcl
 
       # - name: Build custom image
       #   run: packer build -var "artifact_path=$(find ${{ github.workspace }} -name 'webapp.zip')" packer-config/custom_image.pkr.hcl
