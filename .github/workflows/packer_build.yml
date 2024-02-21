@@ -62,15 +62,6 @@ jobs:
       - name: Run Tests
         run: npm test
 
-      # - name: create Artifact
-      #   run: zip -r webapp.zip . -x ".git"
-
-      # - name: Upload Artifact
-      #   uses: actions/upload-artifact@v2
-      #   with:
-      #      name: webapp-artifact
-      #      path: webapp.zip
-
       - id: 'auth'
         uses: 'google-github-actions/auth@v2'
         with:
@@ -94,18 +85,8 @@ jobs:
           sudo mv /tmp/packer /usr/bin/packer
           packer --version
 
-
       - name: Initialize Packer
         run: packer init packer-config/custom_image.pkr.hcl
-
-      - name: Format Packer template
-        run: packer fmt packer-config/custom_image.pkr.hcl
-
-      - name: Validate Packer template
-        run: packer validate packer-config/custom_image.pkr.hcl
      
       - name: Build custom image
         run: packer build packer-config/custom_image.pkr.hcl
-
-      # - name: Build custom image
-      #   run: packer build -var "artifact_path=$(find ${{ github.workspace }} -name 'webapp.zip')" packer-config/custom_image.pkr.hcl
