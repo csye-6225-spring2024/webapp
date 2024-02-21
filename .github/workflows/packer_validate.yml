@@ -10,6 +10,10 @@ jobs:
   build:
     name: test-checker
     runs-on: ubuntu-latest
+    env:
+      DB: ${{ secrets.DB }}
+      DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+      DB_USER: ${{ secrets.DB_USER }}
 
     strategy:
       matrix:

@@ -1,4 +1,3 @@
-
 packer {
   required_plugins {
     googlecompute = {
@@ -10,12 +9,12 @@ packer {
  
 variable "GCP_PROJECT_ID" {
   type    = string
-  default = "tf-gcp-infra-414023"
+  default = "tf-gcp-infra-415001"
 }
  
-variable "source_image" {
+variable "source_image_family" {
   type    = string
-  default = "centos-stream-8-v20240110"
+  default = "centos-stream-8"
 }
  
 variable "zone" {
@@ -28,17 +27,44 @@ variable "ssh_username" {
   default = "centos"
 }
  
+variable "network" {
+  type    = string
+  default = "default"
+}
+ 
 variable "image_name" {
   type    = string
-  default = "custom-image-7"
+  default = "custom-image-10"
+}
+ 
+variable DB_USER {
+  type    = string
+  default = env("DB_USER")
+}
+ 
+variable DB_PASSWORD {
+  type    = string
+  default = env("DB_PASSWORD")
+}
+ 
+variable DB {
+  type    = string
+  default = env("DB")
+}
+ 
+ 
+locals {
+timestamp = regex_replace(formatdate("YYYY-MM-DD-hh-mm-ss", timestamp()), "[- TZ:]", "")
 }
  
 source "googlecompute" "custom-image" {
   project_id   = var.GCP_PROJECT_ID
-  source_image = var.source_image
+  source_image_family = var.source_image_family
   zone         = var.zone
-  ssh_username = var.ssh_username
-  image_name   = var.image_name
+  network      = var.network
+  ssh_username = var.ssh_username  
+  image_name   = "${var.image_name}-${local.timestamp}"
+    
 }
  
 build {
@@ -55,14 +81,19 @@ build {
   }
   provisioner "shell" {
     script = "packer-config/install_dependencies.sh"
+    environment_vars = [
+      "DB_USER=${var.DB_USER}",
+      "DB_PASSWORD=${var.DB_PASSWORD}",
+      "DB=${var.DB}"
+ 
+    ]
   }
   provisioner "shell" {
      script = "packer-config/create_user.sh"
   }
-
+ 
    provisioner "shell" {
      script = "packer-config/configure_systemd.sh"
   }
  
  
-}
