@@ -1,3 +1,4 @@
+
 packer {
   required_plugins {
     googlecompute = {
@@ -12,9 +13,9 @@ variable "GCP_PROJECT_ID" {
   default = "tf-gcp-infra-414023"
 }
  
-variable "source_image_family" {
+variable "source_image" {
   type    = string
-  default = "centos-stream-8"
+  default = "centos-stream-8-v20240110"
 }
  
 variable "zone" {
@@ -29,15 +30,15 @@ variable "ssh_username" {
  
 variable "image_name" {
   type    = string
-  default = "custom-image"
+  default = "custom-image-2"
 }
  
 source "googlecompute" "custom-image" {
-  project_id        = var.GCP_PROJECT_ID
-  source_image_family = var.source_image_family
-  zone              = var.zone
-  ssh_username      = var.ssh_username
-  image_name        = "${var.image_name}-${env.GITHUB_RUN_NUMBER}-${formatdate("2006-01-02T15:04:05Z07:00", timestamp())}"
+  project_id   = var.GCP_PROJECT_ID
+  source_image = var.source_image
+  zone         = var.zone
+  ssh_username = var.ssh_username
+  image_name   = var.image_name
 }
  
 build {
@@ -56,9 +57,12 @@ build {
     script = "packer-config/install_dependencies.sh"
   }
   provisioner "shell" {
-    script = "packer-config/create_user.sh"
+     script = "packer-config/create_user.sh"
   }
-  provisioner "shell" {
-    script = "packer-config/configure_systemd.sh"
+
+   provisioner "shell" {
+     script = "packer-config/configure_systemd.sh"
   }
+ 
+ 
 }
