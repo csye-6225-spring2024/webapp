@@ -34,7 +34,7 @@ variable "network" {
  
 variable "image_name" {
   type    = string
-  default = "custom-image-10"
+  default = "custom-image-11"
 }
  
 variable DB_USER {
