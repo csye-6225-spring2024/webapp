@@ -53,6 +53,12 @@ const { first_name, last_name, password, username } = req.body;
     return res.status(400).json({ message: "Invalid email address" });
     
 }
+
+    // Password validation
+    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z]).{5,10}$/;
+    if (!passwordRegex.test(password)) {
+      return res.status(400).json({ message: "Password must be 5-10 characters long and contain at least one uppercase letter" });
+    }
  
     //  Check for extra attributes
   const extraAttributes = receivedAttributes.filter(attr => !allowedAttributes.includes(attr));
