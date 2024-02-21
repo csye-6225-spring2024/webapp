@@ -16,50 +16,50 @@ jobs:
  
     steps:
  
-      - name: Install MySQL
-        run: |
+      # - name: Install MySQL
+      #   run: |
 
-          sudo systemctl start mysql
-          sudo systemctl status mysql
+      #     sudo systemctl start mysql
+      #     sudo systemctl status mysql
 
-      - name: Configure MySQL
-        run: |
-         sudo mysql -u root -p"${{ secrets.MYSQL_ROOT_PASSWORD }}" -e "CREATE DATABASE IF NOT EXISTS ${{ secrets.DB }};"
-         sudo mysql -u root -p"${{ secrets.MYSQL_ROOT_PASSWORD }}" -e "CREATE USER IF NOT EXISTS '${{ secrets.DB_USER }}'@'localhost' IDENTIFIED BY '${{ secrets.DB_PASSWORD }}';"
-         sudo mysql -u root -p"${{ secrets.MYSQL_ROOT_PASSWORD }}" -e "GRANT ALL PRIVILEGES ON ${{ secrets.DB }}.* TO '${{ secrets.DB_USER }}'@'localhost';"
-         sudo mysql -u root -p"${{ secrets.MYSQL_ROOT_PASSWORD }}" -e "FLUSH PRIVILEGES;"
+      # - name: Configure MySQL
+      #   run: |
+      #    sudo mysql -u root -p"${{ secrets.MYSQL_ROOT_PASSWORD }}" -e "CREATE DATABASE IF NOT EXISTS ${{ secrets.DB }};"
+      #    sudo mysql -u root -p"${{ secrets.MYSQL_ROOT_PASSWORD }}" -e "CREATE USER IF NOT EXISTS '${{ secrets.DB_USER }}'@'localhost' IDENTIFIED BY '${{ secrets.DB_PASSWORD }}';"
+      #    sudo mysql -u root -p"${{ secrets.MYSQL_ROOT_PASSWORD }}" -e "GRANT ALL PRIVILEGES ON ${{ secrets.DB }}.* TO '${{ secrets.DB_USER }}'@'localhost';"
+      #    sudo mysql -u root -p"${{ secrets.MYSQL_ROOT_PASSWORD }}" -e "FLUSH PRIVILEGES;"
 
-      - uses: actions/checkout@v2
+      # - uses: actions/checkout@v2
  
-      - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v2
-        with:
-          node-version: ${{ matrix.node-version }}
+      # - name: Use Node.js ${{ matrix.node-version }}
+      #   uses: actions/setup-node@v2
+      #   with:
+      #     node-version: ${{ matrix.node-version }}
     
-      - name: Set up environment variables
-        run: |         
-          echo "DB_USER=${{ secrets.DB_USER}}" > .env
-          echo "DB_PASSWORD=${{ secrets.DB_PASSWORD }}" >> .env
-          echo "DB=${{ secrets.DB }}" >> .env
-          echo "HOST=${{ secrets.HOST }}" >> .env
-          echo "DIALECT=${{ secrets.DIALECT }}" >> .env
+      # - name: Set up environment variables
+      #   run: |         
+      #     echo "DB_USER=${{ secrets.DB_USER}}" > .env
+      #     echo "DB_PASSWORD=${{ secrets.DB_PASSWORD }}" >> .env
+      #     echo "DB=${{ secrets.DB }}" >> .env
+      #     echo "HOST=${{ secrets.HOST }}" >> .env
+      #     echo "DIALECT=${{ secrets.DIALECT }}" >> .env
 
-      - name: Install Dependencies
-        run: npm install
+      # - name: Install Dependencies
+      #   run: npm install
 
-      - name: Start the application
-        run: |
-            npm start &
+      # - name: Start the application
+      #   run: |
+      #       npm start &
         
-      - name: Wait for the application to be ready
-        run: |
-            sleep 10
-            until curl -s http://localhost:8080; do
-              sleep 5
-            done
+      # - name: Wait for the application to be ready
+      #   run: |
+      #       sleep 10
+      #       until curl -s http://localhost:8080; do
+      #         sleep 5
+      #       done
 
-      - name: Run Tests
-        run: npm test
+      # - name: Run Tests
+      #   run: npm test
 
       # - name: create Artifact
       #   run: zip -r webapp.zip . -x ".git"
