@@ -2,7 +2,7 @@
 
 
 #Install MySQL
-sudo apt-get install -y mysql-server
+sudo yum install -y mysql-server
 sudo systemctl start mysqld
 sudo systemctl enable mysqld
 
