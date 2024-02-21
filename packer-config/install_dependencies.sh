@@ -1,7 +1,7 @@
 #!/bin/bash
  
  
-#Install MySQL
+#Install MySQLL
 sudo yum install -y mysql-server
 sudo systemctl start mysqld
 sudo systemctl enable mysqld
