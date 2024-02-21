@@ -46,7 +46,7 @@ build {
   sources = ["source.googlecompute.custom-image"]
  
   provisioner "file" {
-    source      = "/home/runner/work/webapp/webapp/webapp.zip"
+    source      = "webapp.zip"
     destination = "webapp.zip"
   }
   provisioner "file" {
