@@ -30,7 +30,11 @@ variable "ssh_username" {
  
 variable "image_name" {
   type    = string
-  default = "custom-image-16"
+  default = "custom-image"
+}
+
+locals {
+timestamp = regex_replace(formatdate("YYYY-MM-DD-hh-mm-ss", timestamp()), "[- TZ:]", "")
 }
  
 source "googlecompute" "custom-image" {
@@ -38,7 +42,7 @@ source "googlecompute" "custom-image" {
   source_image_family = var.source_image_family
   zone         = var.zone
   ssh_username = var.ssh_username
-  image_name   = var.image_name
+  image_name   = "${var.image_name}-${local.timestamp}"
 }
  
 build {
