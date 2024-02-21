@@ -33,6 +33,22 @@ variable "image_name" {
   default = "custom-image"
 }
 
+variable DB_USER {
+  type    = string
+  default = env("DB_USER")
+}
+ 
+variable DB_PASSWORD {
+  type    = string
+  default = env("DB_PASSWORD")
+}
+ 
+variable DB {
+  type    = string
+  default = env("DB")
+}
+ 
+
 locals {
 timestamp = regex_replace(formatdate("YYYY-MM-DD-hh-mm-ss", timestamp()), "[- TZ:]", "")
 }
@@ -57,9 +73,20 @@ build {
     source      = "packer-config/webapp.service"
     destination = "/tmp/webapp.service"
   }
+  // provisioner "shell" {
+  //   script = "packer-config/install_dependencies.sh"
+  // }
+
   provisioner "shell" {
     script = "packer-config/install_dependencies.sh"
+    environment_vars = [
+      "DB_USER=${var.DB_USER}",
+      "DB_PASSWORD=${var.DB_PASSWORD}",
+      "DB=${var.DB}"
+ 
+    ]
   }
+  
   provisioner "shell" {
      script = "packer-config/create_user.sh"
   }
