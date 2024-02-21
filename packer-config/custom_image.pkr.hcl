@@ -51,11 +51,11 @@ build {
  
   provisioner "file" {
     source      = "/home/runner/work/webapp/webapp/webapp.zip"
-    destination = "webapp.zip"
+    destination = "/tmp/"
   }
   provisioner "file" {
     source      = "packer-config/webapp.service"
-    destination = "/tmp/webapp.service"
+    destination = "/tmp/"
   }
   provisioner "shell" {
     script = "packer-config/install_dependencies.sh"
