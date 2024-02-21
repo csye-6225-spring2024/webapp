@@ -80,6 +80,11 @@ jobs:
   
       - name: 'Use gcloud CLI'
         run: 'gcloud info'
+
+      
+      - name: Create Artifact
+        run: |
+            zip -r webapp.zip .
         
       - name: Install Packer
         run: |
@@ -88,9 +93,6 @@ jobs:
           sudo mv /tmp/packer /usr/bin/packer
           packer --version
 
-      - name: Create Artifact
-        run: |
-            zip -r webapp.zip .
 
       - name: Initialize Packer
         run: packer init packer-config/custom_image.pkr.hcl
