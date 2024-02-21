@@ -1,3 +1,4 @@
+#workflow
 name: Workflow CI
  
 on:
@@ -61,6 +62,30 @@ jobs:
       - name: Run Tests
         run: npm test
 
+      - id: 'auth'
+        uses: 'google-github-actions/auth@v2'
+        with:
+          credentials_json: '${{ secrets.GCP_SA_KEY }}'
+  
+      - name: 'Set up Cloud SDK'
+        uses: 'google-github-actions/setup-gcloud@v2'
+  
+      - name: 'Use gcloud CLI'
+        run: 'gcloud info'
+
+      
+      - name: Create Artifact
+        run: |
+            zip -r webapp.zip .
+        
+      - name: Install Packer
+        run: |
+          curl -fsSL https://releases.hashicorp.com/packer/1.7.5/packer_1.7.5_linux_amd64.zip -o packer.zip
+          unzip packer.zip -d /tmp
+          sudo mv /tmp/packer /usr/bin/packer
+          packer --version
+
+
       - name: Initialize Packer
         run: packer init packer-config/custom_image.pkr.hcl
 
@@ -69,3 +94,6 @@ jobs:
 
       - name: Validate Packer template
         run: packer validate packer-config/custom_image.pkr.hcl
+     
+      - name: Build custom image
+        run: packer build packer-config/custom_image.pkr.hcl
