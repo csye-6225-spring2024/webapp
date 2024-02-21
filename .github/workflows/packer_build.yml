@@ -1,14 +1,16 @@
-#workfloww
+#workflowww
 name: Workflow CI
  
 on:
-  push:
+  pull_request:
+    types: [closed]
     branches:
       - main
 
 jobs:
   build:
     name: test-build
+    if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
     env:
       DB: ${{ secrets.DB }}
