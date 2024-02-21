@@ -95,5 +95,6 @@ build {
    provisioner "shell" {
      script = "packer-config/configure_systemd.sh"
   }
+}
  
  
