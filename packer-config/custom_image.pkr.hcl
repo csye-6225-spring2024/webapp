@@ -9,7 +9,7 @@ packer {
  
 variable "GCP_PROJECT_ID" {
   type    = string
-  default = "tf-gcp-infra-415001"
+  default = "tf-gcp-infra-414023"
 }
  
 variable "source_image_family" {
