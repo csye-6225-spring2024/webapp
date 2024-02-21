@@ -30,7 +30,7 @@ variable "ssh_username" {
  
 variable "image_name" {
   type    = string
-  default = "custom-image-13"
+  default = "custom-image-14"
 }
  
 source "googlecompute" "custom-image" {
@@ -56,9 +56,9 @@ build {
   provisioner "shell" {
     script = "packer-config/install_dependencies.sh"
   }
-  provisioner "shell" {
-     script = "packer-config/create_user.sh"
-  }
+  // provisioner "shell" {
+  //    script = "packer-config/create_user.sh"
+  // }
 
    provisioner "shell" {
      script = "packer-config/configure_systemd.sh"
