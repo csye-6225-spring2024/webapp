@@ -13,9 +13,9 @@ variable "GCP_PROJECT_ID" {
   default = "tf-gcp-infra-414023"
 }
  
-variable "source_image" {
+variable "source_image_family" {
   type    = string
-  default = "centos-stream-8-v20240110"
+  default = "centos-stream-8"
 }
  
 variable "zone" {
@@ -30,12 +30,12 @@ variable "ssh_username" {
  
 variable "image_name" {
   type    = string
-  default = "custom-image-15"
+  default = "custom-image-16"
 }
  
 source "googlecompute" "custom-image" {
   project_id   = var.GCP_PROJECT_ID
-  source_image = var.source_image
+  source_image_family = var.source_image_family
   zone         = var.zone
   ssh_username = var.ssh_username
   image_name   = var.image_name
