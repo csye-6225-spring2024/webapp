@@ -30,7 +30,7 @@ variable "ssh_username" {
  
 variable "image_name" {
   type    = string
-  default = "custom-image-5"
+  default = "custom-image-6"
 }
  
 source "googlecompute" "custom-image" {
