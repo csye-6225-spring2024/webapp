@@ -2,7 +2,6 @@
 
 
 #Install MySQL
-sudo rpm -Uvh mysql80-community-release-el8-1.noarch.rpm
 sudo yum install -y mysql-server
 sudo systemctl start mysqld
 sudo systemctl enable mysqld
