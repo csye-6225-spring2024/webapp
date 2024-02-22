@@ -1,11 +1,10 @@
-#workflow
 name: Workflow CI
  
 on:
   pull_request:
     branches:
       - main
-
+ 
 jobs:
   build:
     name: test-checker
@@ -14,26 +13,26 @@ jobs:
       DB: ${{ secrets.DB }}
       DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
       DB_USER: ${{ secrets.DB_USER }}
-
+      
     strategy:
       matrix:
         node-version: [20.x]
  
     steps:
  
-      - name: Install MySQL
+      - name: Start MySQL
         run: |
-
+ 
           sudo systemctl start mysql
           sudo systemctl status mysql
-
+ 
       - name: Configure MySQL
         run: |
          sudo mysql -u root -p"${{ secrets.MYSQL_ROOT_PASSWORD }}" -e "CREATE DATABASE IF NOT EXISTS ${{ secrets.DB }};"
          sudo mysql -u root -p"${{ secrets.MYSQL_ROOT_PASSWORD }}" -e "CREATE USER IF NOT EXISTS '${{ secrets.DB_USER }}'@'localhost' IDENTIFIED BY '${{ secrets.DB_PASSWORD }}';"
          sudo mysql -u root -p"${{ secrets.MYSQL_ROOT_PASSWORD }}" -e "GRANT ALL PRIVILEGES ON ${{ secrets.DB }}.* TO '${{ secrets.DB_USER }}'@'localhost';"
          sudo mysql -u root -p"${{ secrets.MYSQL_ROOT_PASSWORD }}" -e "FLUSH PRIVILEGES;"
-
+ 
       - uses: actions/checkout@v2
  
       - name: Use Node.js ${{ matrix.node-version }}
@@ -48,10 +47,10 @@ jobs:
           echo "DB=${{ secrets.DB }}" >> .env
           echo "HOST=${{ secrets.HOST }}" >> .env
           echo "DIALECT=${{ secrets.DIALECT }}" >> .env
-
+ 
       - name: Install Dependencies
         run: npm install
-
+ 
       - name: Start the application
         run: |
             npm start &
@@ -62,26 +61,26 @@ jobs:
             until curl -s http://localhost:8080; do
               sleep 5
             done
-
+ 
       - name: Run Tests
         run: npm test
-
-      - name: Create Artifact
+ 
+      - name: Create webapp.zip
         run: |
-            zip -r webapp.zip .
-        
+            zip -r webapp.zip ./
+            
       - name: Install Packer
         run: |
           curl -fsSL https://releases.hashicorp.com/packer/1.7.5/packer_1.7.5_linux_amd64.zip -o packer.zip
           unzip packer.zip -d /tmp
           sudo mv /tmp/packer /usr/bin/packer
           packer --version
-
+ 
       - name: Initialize Packer
         run: packer init packer-config/custom_image.pkr.hcl
-
+ 
       - name: Format Packer template
         run: packer fmt packer-config/custom_image.pkr.hcl
-
+ 
       - name: Validate Packer template
-        run: packer validate packer-config/custom_image.pkr.hcl
+        run: packer validate -var 'project_id=${{ secrets.GCP_PROJECT_ID }}' packer-config/custom_image.pkr.hcl   
