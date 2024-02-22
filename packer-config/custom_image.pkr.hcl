@@ -1,4 +1,3 @@
-
 packer {
   required_plugins {
     googlecompute = {
@@ -8,9 +7,8 @@ packer {
   }
 }
  
-variable "GCP_PROJECT_ID" {
+variable "project_id" {
   type    = string
-  default = "tf-gcp-infra-414023"
 }
  
 variable "source_image_family" {
@@ -25,24 +23,47 @@ variable "zone" {
  
 variable "ssh_username" {
   type    = string
-  default = "centos"
+  default = "packer"
+}
+ 
+variable "network" {
+  type    = string
+  default = "default"
 }
  
 variable "image_name" {
   type    = string
   default = "custom-image"
 }
-
+ 
+variable DB_USER {
+  type    = string
+  default = env("DB_USER")
+}
+ 
+variable DB_PASSWORD {
+  type    = string
+  default = env("DB_PASSWORD")
+}
+ 
+variable DB {
+  type    = string
+  default = env("DB")
+}
+ 
+ 
 locals {
 timestamp = regex_replace(formatdate("YYYY-MM-DD-hh-mm-ss", timestamp()), "[- TZ:]", "")
 }
  
 source "googlecompute" "custom-image" {
-  project_id   = var.GCP_PROJECT_ID
+  project_id   = var.project_id
   source_image_family = var.source_image_family
   zone         = var.zone
-  ssh_username = var.ssh_username
+  network      = var.network
+  ssh_username = var.ssh_username  
   image_name   = "${var.image_name}-${local.timestamp}"
+    
 }
  
 build {
@@ -50,23 +71,27 @@ build {
   sources = ["source.googlecompute.custom-image"]
  
   provisioner "file" {
-    source      = "/home/runner/work/webapp/webapp/webapp.zip"
-    destination = "/tmp/"
+    source      = "./webapp.zip"
+    destination = "/tmp/webapp.zip"
   }
   provisioner "file" {
     source      = "packer-config/webapp.service"
-    destination = "/tmp/"
+    destination = "/tmp/webapp.service"
   }
   provisioner "shell" {
     script = "packer-config/install_dependencies.sh"
+    environment_vars = [
+      "DB_USER=${var.DB_USER}",
+      "DB_PASSWORD=${var.DB_PASSWORD}",
+      "DB=${var.DB}"
+ 
+    ]
   }
   provisioner "shell" {
      script = "packer-config/create_user.sh"
   }
-
+ 
    provisioner "shell" {
      script = "packer-config/configure_systemd.sh"
   }
- 
- 
 }
