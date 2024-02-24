@@ -1,4 +1,4 @@
-packer {
+packer 
   required_plugins {
     googlecompute = {
       version = ">= 1.1.4"
