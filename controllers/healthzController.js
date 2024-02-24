@@ -1,4 +1,4 @@
-// Controller function to handle healthz endpoint
+// Controller function to handle healthz endpoints
  
 const healthzCheck = async (req, res) => {
   try {
