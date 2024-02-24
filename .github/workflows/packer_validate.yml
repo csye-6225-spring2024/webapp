@@ -76,11 +76,8 @@ jobs:
           sudo mv /tmp/packer /usr/bin/packer
           packer --version
  
-      - name: Initialize Packer
-        run: packer init packer-config/custom_image.pkr.hcl
- 
       - name: Format Packer template
-        run: packer fmt packer-config/custom_image.pkr.hcl
+        run: packer fmt -check packer-config/custom_image.pkr.hcl
  
       - name: Validate Packer template
         run: packer validate -var 'project_id=${{ secrets.GCP_PROJECT_ID }}' packer-config/custom_image.pkr.hcl   
