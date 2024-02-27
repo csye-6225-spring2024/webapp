@@ -46,10 +46,9 @@ source "googlecompute" "custom-image" {
   zone         = var.zone
   network      = var.network
   ssh_username = var.ssh_username  
-  image_name   = "${var.image_name}-${local.timestamp}"
-    
+  image_name   = "${var.image_name}-${local.timestamp}"    
 }
- 
+
 build {
   name    = "custom-image-builder"
   sources = ["source.googlecompute.custom-image"]
