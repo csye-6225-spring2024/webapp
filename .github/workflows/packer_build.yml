@@ -24,7 +24,6 @@ jobs:
  
       - name: Start MySQL
         run: |
- 
           sudo systemctl start mysql
           sudo systemctl status mysql
  
