@@ -64,8 +64,6 @@ jobs:
       - name: Run Tests
         run: npm test
 
-      - name: Remove .env file
-        run: rm .env
  
       - name: Create webapp.zip
         run: |
@@ -81,8 +79,8 @@ jobs:
       - name: Initialize Packer
         run: packer init packer-config/custom_image.pkr.hcl
  
-      # - name: Format Packer template
-      #   run: packer fmt -check packer-config/custom_image.pkr.hcl
+      - name: Format Packer template
+        run: packer fmt -check packer-config/custom_image.pkr.hcl
  
-      # - name: Validate Packer template
-      #   run: packer validate -var 'project_id=${{ secrets.GCP_PROJECT_ID }}' packer-config/custom_image.pkr.hcl   
+      - name: Validate Packer template
+        run: packer validate -var 'project_id=${{ secrets.GCP_PROJECT_ID }}' packer-config/custom_image.pkr.hcl   

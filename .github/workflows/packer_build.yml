@@ -65,6 +65,9 @@ jobs:
  
       - name: Run Tests
         run: npm test
+
+      - name: Remove .env file
+        run: rm .env
  
       - id: 'auth'
         uses: 'google-github-actions/auth@v2'
