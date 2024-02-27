@@ -1,79 +1,68 @@
-Cloud-Native Application README:
+## Cloud-Native Application:
 •   Programming Language: Node.js
 •   Relational Database: MySQL
 •   Backend Framework: Express.js
 •   ORM Framework: Sequelize
  
 Installation:
-npm init -> to initialize npm packages
-npm install —> to install all dependencies
-npm start —> to start the server
+npm init 
+npm install 
+npm start 
  
-Health Check (/healthz)
-•   Checks if the application has connectivity to the database.
-•   Returns HTTP "200 OK" —> if the connection is successful.
-•   Returns HTTP "503 Service Unavailable" —> if the connection is unsuccessful.
+ Health Check (/healthz)
+•  The health check endpoint (/healthz) validates the application's connectivity to the database.
+•  It returns an HTTP status code of "200 OK" upon successful connection.
+•  If the connection to the database fails, it responds with "503 Service Unavailable" status code.
  
 Method: GET
-•   Description: Endpoint to check the health of the application.
-•   Success Response —> "200 OK"
-•   Other Endpoints in Method: GET—> Other endpoints are not implemented and will return a "404 Not Found response".
+•  This endpoint functions as a health indicator for the application. A "200 OK" response confirms its successful operation. For other endpoints accessed using the GET method, a "404 Not Found" response will be returned if they are not implemented.
  
-Other API request
-•   Method: POST,DELETE,PUT,PATCH
-•   Description: Other API requests are not implemented as per the requirement and will return a "405 Method not allowed" irrespective of whether DB is connected or not.
+ Other request
+•  The API requests for POST, DELETE, PUT, and PATCH methods are not configured as per the specifications. Thus, attempting to use these requests will lead to a "405 Method Not Allowed" response, regardless of the database connection status.
+
  
-Middlewares
-•   checkDBConnection: Middleware to ensure the application has connectivity to the database.
-•   checkPayloadAndQueryParams: Middleware to check if there is any request body with payload and also if there is any query params in the request, if yes it will return —>"400 Bad request" irrespective of whether DB is connected or not.
- 
-Assignment 02:
+## Assignment 02:
  
 POST request --> /v1/user
  
-• User can create an account by providing email address, password, first name, and last name --> 201
-• While account creation, account_created and account_updated field should be set to the current time. Even if the user gives any value for account_created and account_updated field then it should be ignored.
-• Email Address: Users should provide a valid email address and it cant be empty --> 400
-                 If email address already exists - 400
-• Password: Password should be securely hashed using the BCrypt password hashing scheme with salt.
-            If the password field is empty --> 400
-• First Name and Last Name: Users should provide their first name and last name.
-                            If it is empty -->400
-• Response Payload: The response payload should include the user's email address, first name, last name, and the timestamp of account creation. However, the password should never be returned in the response payload.
- 
+• Users can register by providing their email address, password, first name, and last name, resulting in a "201 Created" status code.
+• During account creation, the fields for account creation and update are automatically set to the current time, overriding any user-provided values for these fields.
+• An empty or invalid email address will trigger a "400 Bad Request" response, as will attempting to register with an email address that already exists.
+• Passwords must be securely hashed using the BCrypt hashing scheme with salt; an empty password field will result in a "400 Bad Request" response.
+• Users must provide both their first and last names; failing to do so will prompt a "400 Bad Request" response.
+• The response payload for successful account creation includes the user's email address, first name, last name, and the timestamp of account creation. However, the password is never included in the response payload.
 GET request --> /v1/user/self
  
-• User can retrieve account information from the application based on their authentication credentials such as user ID and password -->200
-• If there is mismatch in the username, password or if the user entered details doesnt exist or if the username or password is empty --> 400
-• If there is no db connection -->503
-• Response Payload: When a user requests their account information, the response payload should include all fields for the user except for the password.
- 
+• Users can access their account information by providing authentication credentials like user ID and password, resulting in a status code of "200 OK".
+• If there's a discrepancy in the provided username or password, or if the user details don't exist, or if the username or password fields are empty, the response status code will be "400 Bad Request".
+• In case of a database connection issue, the endpoint responds with a status code of "503 Service Unavailable".
+The response payload for a successful request includes all user fields except for the password.
  
 PUT request --> /v1/user/self
-• Users can only update their own account information and they must be authenticated using basic authentication -->204
-• If the user is not authenticated or if user provides invalid username and password--->401
-• Users should only be allowed to update the following fields: First Name, Last Name, Password, if anyother fields are present in the payload then -->400
-• Similarly if the provided First Name, Last Name, Password is invalid or empty -->400
-• No DB connection -->503
-• Account_updated field should be updated when the user update is successful.
- 
-Assignment 03:
+• Users are permitted to modify their personal account details exclusively, and authentication via basic authentication is obligatory, resulting in a status code of "204 No Content".
+•  If a user lacks authentication credentials or provides invalid username and password combinations, the response status code will be "401 Unauthorized".
+•  Only specific fields, namely First Name, Last Name, and Password, can be updated by users; any other fields present in the payload will lead to a status code of "400 Bad Request".
+•  Similarly, if the provided First Name, Last Name, or Password are either invalid or empty, the response status code will be "400 Bad Request".
+• In the event of a database connection issue, the endpoint returns a status code of "503 Service Unavailable".
+ The "Account_updated" field is updated upon successful user updates.
+
+## Assignment 03:
  
 GitHub Actions Integration Tests Workflow:
  
-The repository includes a GitHub Actions workflow named "test-checker" specifically designed for integration testing of the /v1/user endpoint.
+The repository contains a GitHub Actions workflow titled "test-checker," crafted specifically for conducting integration tests on the /v1/user endpoint.
  
 Workflow Description:
  
 The workflow consists of the following steps:
  
-• Install MySQL: Starts the MySQL service.
-• Configure MySQL: Sets up the MySQL database by creating a database, user, and granting necessary privileges.
-• Use Node.js: Sets up Node.js environment
-• Set up environment variables: Sets up environment variables required for the application to connect to the MySQL database.
-• Install Dependencies: Installs the project dependencies using npm.
-• Start the application: Starts the application by running "npm start".
-• Run Tests: Executes the integration tests defined in the "test" directory using the "npm test" command.
+• MySQL Installation: Initiates the MySQL service.
+• MySQL Configuration: Establishes the MySQL database, including database creation, user setup, and granting of essential privileges.
+• Node.js Setup: Configures the Node.js environment.
+• Environment Variable Configuration: Prepares the necessary environment variables for the application to connect to the MySQL database.
+• Dependency Installation: Installs project dependencies via npm.
+• Application Startup: Commences the application by executing the "npm start" command.
+• Testing: Runs integration tests specified in the "test" directory using the "npm test" command.
  
 Test Environment Configuration:
  
@@ -99,14 +88,10 @@ The workflow ensures that the application interacts correctly with the MySQL dat
 
 ## Assignment 04:
 
-1. Custom image is built from the centos 8 stream and it is setup to be in run in our default VPC by default.
-2. Custom image consists of dependencies like mysql, node and creation of user and group based on given requirements (user:csye6225, group:csye6225)
-3. The webapp services is automatically started using systemd file webapp.service.
-4. To deploy the custom image in GCP service account with the following roles were enabled
-       1) Compute Engine Instance Admin (v1)
-       2) Service Account User.
-    Service Account -> keys -> Json-> file gets downloaded.
-    The JSON key is stored as secret in organisation webapp repo.
-5. Two workflows have been built, namely test-build and test-checker
-6. The test-checker consists of integration tests, build project artifacts, packer init, packer fmt and packer validate.
-7. The test-validator consists of intergration tests, build project artifacts, authentication, packer init, packer build and custom image gets build on merge.
+• A custom image is created from the CentOS 8 stream, configured to run within our default VPC.
+• The custom image includes essential dependencies such as MySQL and Node.js, along with the creation of user and group as per specified requirements (user: csye6225, group: csye6225).
+• Web application services are automatically initiated using the systemd file webapp.service.
+• For deploying the custom image in the GCP service account, necessary roles have been enabled, including Compute Engine • • • Instance Admin (v1) and Service Account User. The JSON key generated from the service account is downloaded and stored   securely as a secret in the organization's webapp repository.
+• Two workflows are established, named test-build and test-checker.
+• The test-checker workflow encompasses integration tests, building project artifacts, initializing Packer, formatting with Packer fmt, and validating with Packer validate.
+• The test-validator workflow includes integration tests, building project artifacts, authentication, initializing Packer, building the custom image, and automatically deploying it upon merge.

@@ -4,19 +4,19 @@ import { expect } from "chai";
 axios.defaults.baseURL = "http://localhost:8080";
  
 describe("User Endpoint Integration Tests", () => {
-  it("should create an account and validate its existence with GET", async () => {
+  it("Create an account and verify its presence using a GET request.", async () => {
     // POST request to create a new user
     const createUserResponse = await axios.post("/v1/user", {
       first_name: "test",
       last_name: "test",
       username: "test@gmail.com",
-      password: "test",
+      password: "Test@12345",
     });
     expect(createUserResponse.status).to.equal(201);
     const userId = createUserResponse.data.id;
     // Authenticate
     const authHeader = `Basic ${Buffer.from(
-      "test@gmail.com:test"
+      "test@gmail.com:Test@12345"
     ).toString("base64")}`;
     // Send a GET request
     const getUserResponse = await axios.get("/v1/user/self", {
@@ -28,16 +28,16 @@ describe("User Endpoint Integration Tests", () => {
     expect(getUserResponse.data.id).to.equal(userId);
   });
  
-  it("should update an account and validate the changes with GET", async () => {
+  it("Update an account and verify the modifications using a GET request.", async () => {
     // Authenticate
     const authHeader = `Basic ${Buffer.from(
-      "test@gmail.com:test"
+      "test@gmail.com:Test@12345"
     ).toString("base64")}`;
     // Send a PUT request
     const updateUserResponse = await axios.put("/v1/user/self", {
       first_name: 'testnew',
       last_name: 'testnew',
-      password: 'test'
+      password: 'Test@12345'
     }, {
       headers: {
         Authorization: authHeader,
