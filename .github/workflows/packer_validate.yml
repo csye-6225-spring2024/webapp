@@ -63,6 +63,9 @@ jobs:
  
       - name: Run Tests
         run: npm test
+
+      - name: Remove .env file
+        run: rm .env
  
       - name: Create webapp.zip
         run: |
