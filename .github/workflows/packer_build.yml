@@ -11,10 +11,10 @@ jobs:
     name: test-build
     #if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
-    env:
-      DB: ${{ secrets.DB }}
-      DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
-      DB_USER: ${{ secrets.DB_USER }}
+    # env:
+    #   DB: ${{ secrets.DB }}
+    #   DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+    #   DB_USER: ${{ secrets.DB_USER }}
       
     strategy:
       matrix:
