@@ -137,13 +137,13 @@ const addUser = async (req, res) => {
 
 // Fetching user details following basic authentication.
     const getUser = async (req, res) => {
-        console.log(req.body !== '');
-        if (req.method === 'GET' && req.body !== '') {
-            // if (req.body && Object.keys(req.body).length > 0) {
-                res.status(400).send("Request body should be empty for GET requests.");
-                return;
-            // }
-    } 
+    //     console.log(req.body !== '');
+    //     if (req.method === 'GET' && req.body !== '') {
+    //         // if (req.body && Object.keys(req.body).length > 0) {
+    //             res.status(400).send("Request body should be empty for GET requests.");
+    //             return;
+    //         // }
+    // } 
   const isDBConnected = await dbConnectionCheck();
           if (!isDBConnected) {
               res.status(503).send("Database Connectivity Error");
