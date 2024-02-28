@@ -64,9 +64,6 @@ jobs:
         run: |
             zip -r webapp.zip ./
  
-      - name: Initialize Packer
-        run: packer init packer-config/custom_image.pkr.hcl
- 
       - name: Format Packer template
         run: packer fmt -check packer-config/custom_image.pkr.hcl
  
