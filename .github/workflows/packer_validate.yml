@@ -9,10 +9,6 @@ jobs:
   build:
     name: test-checker
     runs-on: ubuntu-latest
-    # env:
-    #   DB: ${{ secrets.DB }}
-    #   DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
-    #   DB_USER: ${{ secrets.DB_USER }}
       
     strategy:
       matrix:
@@ -64,20 +60,19 @@ jobs:
       - name: Run Tests
         run: npm test
 
- 
       - name: Create webapp.zip
         run: |
             zip -r webapp.zip ./
             
-      - name: Install Packer
-        run: |
-          curl -fsSL https://releases.hashicorp.com/packer/1.7.5/packer_1.7.5_linux_amd64.zip -o packer.zip
-          unzip packer.zip -d /tmp
-          sudo mv /tmp/packer /usr/bin/packer
-          packer --version
+      # - name: Install Packer
+      #   run: |
+      #     curl -fsSL https://releases.hashicorp.com/packer/1.7.5/packer_1.7.5_linux_amd64.zip -o packer.zip
+      #     unzip packer.zip -d /tmp
+      #     sudo mv /tmp/packer /usr/bin/packer
+      #     packer --version
  
-      - name: Initialize Packer
-        run: packer init packer-config/custom_image.pkr.hcl
+      # - name: Initialize Packer
+      #   run: packer init packer-config/custom_image.pkr.hcl
  
       - name: Format Packer template
         run: packer fmt -check packer-config/custom_image.pkr.hcl
