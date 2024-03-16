@@ -1,0 +1,18 @@
+logging:
+  receivers:
+    my-app-receiver:
+      type: files
+      include_paths:
+        - /path/to/your/application/logs/*.log 
+      record_log_file_path: true
+  processors:
+    my-app-processor:
+      type: nodejs
+      parsers:
+        my-app-parser:
+          script_path: # Path to your Node.js parsing script
+  service:
+    pipelines:
+      default_pipeline:
+        receivers: [my-app-receiver]
+        processors: [my-app-processor]
