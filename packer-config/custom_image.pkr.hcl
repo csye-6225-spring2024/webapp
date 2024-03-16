@@ -76,10 +76,10 @@ build {
       "sudo curl -sSO https://dl.google.com/cloudagents/add-google-cloud-ops-agent-repo.sh",
       "sudo bash add-google-cloud-ops-agent-repo.sh --also-install",
       # Configure Ops Agent for application logs
-      "sudo echo 'logging:' >> /etc/google-cloud-ops-agent/config.yaml",
-      "sudo echo '  logs:' >> /etc/google-cloud-ops-agent/config.yaml",
-      "sudo echo '    - name: Webapp logs' >> /etc/google-cloud-ops-agent/config.yaml",
-      "sudo echo '      file: /path/to/your/application/logs/*.log' >> /etc/google-cloud-ops-agent/config.yaml",
+      "echo 'logging:' | sudo tee -a /etc/google-cloud-ops-agent/config.yaml",
+      "echo '  logs:' | sudo tee -a /etc/google-cloud-ops-agent/config.yaml",
+      "echo '    - name: Webapp logs' | sudo tee -a /etc/google-cloud-ops-agent/config.yaml",
+      "echo '      file: /path/to/your/application/logs/*.log' | sudo tee -a /etc/google-cloud-ops-agent/config.yaml",
       # Restart Ops Agent
       "sudo systemctl restart google-cloud-ops-agent"
     ]
