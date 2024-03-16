@@ -4,7 +4,7 @@ import { dbConnection, healthCheck } from './controllers/healthController.js';
 import { handlePayloadChecks } from './controllers/payload.js';
 import sequelize from './config/dbConfig.js';
 import router from './routes/userRoutes.js';
-import logger from './logger.js';
+// import logger from './logger.js';
 
 
 const app = express();
@@ -106,7 +106,7 @@ app.use('/v1/user', router);
 // Synchronize the model with the database
 sequelize.sync().then(() => {
   const PORT = 8080;
-  app.listen(PORT, () => logger.info(`Server listening on ${PORT}`));
+  app.listen(PORT, () => console.log(`Server listening on ${PORT}`));
 });
 
 export default app;
