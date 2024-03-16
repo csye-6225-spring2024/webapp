@@ -81,7 +81,7 @@ build {
       "echo '    - name: Webapp logs' | sudo tee -a /etc/google-cloud-ops-agent/config.yaml",
       "echo '      file: /path/to/your/application/logs/*.log' | sudo tee -a /etc/google-cloud-ops-agent/config.yaml",
       # Restart Ops Agent
-      "sudo systemctl restart google-cloud-ops-agent"
+      #"sudo systemctl restart google-cloud-ops-agent"
     ]
   }
 }
