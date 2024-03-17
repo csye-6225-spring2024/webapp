@@ -73,15 +73,14 @@ build {
   provisioner "shell" {
     inline = [
       # Install Ops Agent
-      "sudo curl -sSO https://dl.google.com/cloudagents/add-google-cloud-ops-agent-repo.sh",
-      "sudo bash add-google-cloud-ops-agent-repo.sh --also-install",
-      # Configure Ops Agent for application logs
-      "echo 'logging:' | sudo tee -a /etc/google-cloud-ops-agent/config.yaml",
-      "echo '  logs:' | sudo tee -a /etc/google-cloud-ops-agent/config.yaml",
-      "echo '    - name: Webapp logs' | sudo tee -a /etc/google-cloud-ops-agent/config.yaml",
-      "echo '      file: /path/to/your/application/logs/*.log' | sudo tee -a /etc/google-cloud-ops-agent/config.yaml",
+      "curl -sSO https://dl.google.com/cloudagents/add-google-cloud-ops-agent-repo.sh",
+      "bash add-google-cloud-ops-agent-repo.sh --also-install",
+      # Echo contents of packer-config/config.yaml to /etc/google-cloud-ops-agent/config.yaml
+      "cat << EOF > /etc/google-cloud-ops-agent/config.yaml",
+      "${file("packer-config/config.yaml")}",
+      "EOF",
       # Restart Ops Agent
-      #"sudo systemctl restart google-cloud-ops-agent"
+      "systemctl restart google-cloud-ops-agent"
     ]
   }
 }

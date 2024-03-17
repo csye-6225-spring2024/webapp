@@ -3,7 +3,7 @@ logging:
     my-app-receiver:
       type: files
       include_paths:
-        - /path/to/your/application/logs/*.log 
+        - /var/logs/webapp/webapp.logs
       record_log_file_path: true
   processors:
     my-app-processor:
@@ -16,3 +16,5 @@ logging:
       default_pipeline:
         receivers: [my-app-receiver]
         processors: [my-app-processor]
+
+        
