@@ -73,14 +73,14 @@ build {
   provisioner "shell" {
     inline = [
       # Install Ops Agent
-      "curl -sSO https://dl.google.com/cloudagents/add-google-cloud-ops-agent-repo.sh",
-      "bash add-google-cloud-ops-agent-repo.sh --also-install",
+      "sudo curl -sSO https://dl.google.com/cloudagents/add-google-cloud-ops-agent-repo.sh",
+      "sudo bash add-google-cloud-ops-agent-repo.sh --also-install",
       # Echo contents of packer-config/config.yaml to /etc/google-cloud-ops-agent/config.yaml
-      "cat << EOF > /etc/google-cloud-ops-agent/config.yaml",
-      "${file("config.yaml")}",
+      "sudo cat << EOF > /etc/google-cloud-ops-agent/config.yaml",
+      "${file("packer-config/config.yaml")}",
       "EOF",
       # Restart Ops Agent
-      "systemctl restart google-cloud-ops-agent"
+      "sudo systemctl restart google-cloud-ops-agent"
     ]
   }
 }
