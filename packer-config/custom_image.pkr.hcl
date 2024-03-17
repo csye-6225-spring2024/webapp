@@ -53,6 +53,11 @@ build {
   name    = "custom-image-builder"
   sources = ["source.googlecompute.custom-image"]
 
+
+  provisioner "file" {
+    source      = "packer-config/config.yaml"
+    destination = "/tmp/config.yaml"
+  }
   provisioner "shell" {
     inline = [
       "sudo curl -sSO https://dl.google.com/cloudagents/add-google-cloud-ops-agent-repo.sh",
@@ -80,10 +85,10 @@ build {
   provisioner "shell" {
     script = "packer-config/configure_systemd.sh"
   }
-  provisioner "file" {
-    source      = "packer-config/config.yaml"
-    destination = "/tmp/config.yaml"
-  }
+  // provisioner "file" {
+  //   source      = "packer-config/config.yaml"
+  //   destination = "/tmp/config.yaml"
+  // }
   // provisioner "shell" {
   //   inline = [
   //     "sudo curl -sSO https://dl.google.com/cloudagents/add-google-cloud-ops-agent-repo.sh",
