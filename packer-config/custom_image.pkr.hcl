@@ -96,7 +96,7 @@ build {
   //     "sudo mv /tmp/config.yaml /etc/google-cloud-ops-agent/config.yaml",
   //     "sudo chown csye6225:csye6225 /var/log/"
   //     "sudo mkdir /var/log/webapp",
-  //     //"sudo systemctl restart google-cloud-ops-agent"
+  //     // //"sudo systemctl restart google-cloud-ops-agent"
   //   ]
   // }
 }
