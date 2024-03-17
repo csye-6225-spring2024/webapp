@@ -1,12 +1,12 @@
-const winston = require('winston');
+import winston from 'winston';
 
 // Create a logger instance
 const logger = winston.createLogger({
-  level: 'info', 
-  format: winston.format.json(), 
+  level: 'info',
+  format: winston.format.json(),
   transports: [
-    new winston.transports.Console(), 
-    new winston.transports.File({ filename: 'logfile.log' }) 
+    new winston.transports.Console(),
+    new winston.transports.File({ filename: '/tmp/webapp.log' })
   ]
 });
 
@@ -73,5 +73,5 @@ logger.warn('This is a warning message');
 // };
 
 // // Export the logger so it can be used in other files
-// module.exports = logger;
+export default logger;
 
