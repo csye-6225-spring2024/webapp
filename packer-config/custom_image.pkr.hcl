@@ -70,16 +70,14 @@ build {
   provisioner "shell" {
     script = "packer-config/configure_systemd.sh"
   }
+  provisioner "file" {
+    source      = "config.yaml"
+    destination = "/etc/google-cloud-ops-agent/config.yaml"
+  }
   provisioner "shell" {
     inline = [
-      # Install Ops Agent
       "sudo curl -sSO https://dl.google.com/cloudagents/add-google-cloud-ops-agent-repo.sh",
       "sudo bash add-google-cloud-ops-agent-repo.sh --also-install",
-      # Echo contents of packer-config/config.yaml to /etc/google-cloud-ops-agent/config.yaml
-      "sudo cat << EOF > /etc/google-cloud-ops-agent/config.yaml",
-      "${file("config.yaml")}",
-      "EOF",
-      # Restart Ops Agent
       "sudo systemctl restart google-cloud-ops-agent"
     ]
   }
