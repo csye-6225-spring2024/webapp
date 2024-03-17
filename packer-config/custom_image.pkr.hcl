@@ -71,7 +71,7 @@ build {
     script = "packer-config/configure_systemd.sh"
   }
   provisioner "file" {
-    source      = "config.yaml"
+    source      = "packer-config/config.yaml"
     destination = "/etc/google-cloud-ops-agent/config.yaml"
   }
   provisioner "shell" {
