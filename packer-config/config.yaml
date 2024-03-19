@@ -3,7 +3,7 @@ logging:
     my-app-receiver:
       type: files
       include_paths:
-        - /var/log/webapp.log
+        - /var/log/webapp/webapp.log
       record_log_file_path: true
   processors:
     my-app-processor:
@@ -15,3 +15,54 @@ logging:
       default_pipeline:
         receivers: [my-app-receiver]
         processors: [my-app-processor]
+
+
+# logging:
+#   receivers:
+#     error-receiver:
+#       type: files
+#       include_paths:
+#         - /var/log/webapp/error.log
+#       record_log_file_path: true
+
+#     warn-receiver:
+#       type: files
+#       include_paths:
+#         - /var/log/webapp/warn.log
+#       record_log_file_path: true
+
+#     info-receiver:
+#       type: files
+#       include_paths:
+#         - /var/log/webapp/info.log
+#       record_log_file_path: true
+
+#   processors:
+#     error-processor:
+#       type: parse_json
+#       time_key: time
+#       time_format: "%Y-%m-%dT%H:%M:%S.%L%Z"
+
+#     warn-processor:
+#       type: parse_json
+#       time_key: time
+#       time_format: "%Y-%m-%dT%H:%M:%S.%L%Z"
+
+#     info-processor:
+#       type: parse_json
+#       time_key: time
+#       time_format: "%Y-%m-%dT%H:%M:%S.%L%Z"
+
+#   service:
+#     pipelines:
+#       error-pipeline:
+#         receivers: [error-receiver]
+#         processors: [error-processor]
+
+#       warn-pipeline:
+#         receivers: [warn-receiver]
+#         processors: [warn-processor]
+
+#       info-pipeline:
+#         receivers: [info-receiver]
+#         processors: [info-processor]
