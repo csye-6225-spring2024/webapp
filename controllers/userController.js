@@ -26,6 +26,7 @@ passwdValidator
         return true;
     } catch (error) {
         console.error('Database Connectivity Error:', error);
+        logger.error('Database Connectivity Error:', error);
         return false; 
     }
 };
@@ -41,6 +42,7 @@ const isAlphaString = (str) => {
     // Check if any of the required fields is missing in the request body
     const missingFields = requiredFields.filter(field => !(field in req.body));
     if (missingFields.length > 0) {
+        logger.warn(`Required fields are missing: ${missingFields.join(', ')}.`);
         res.status(400).send(`Required fields are missing: ${missingFields.join(', ')}.`);
         return;
     }
@@ -56,6 +58,7 @@ const addUser = async (req, res) => {
       checkRequiredFields(req, res, async () => {
           // Check if the request body is empty
           if (Object.keys(req.body).length === 0) {
+              logger.debug("Request body is empty.");
               res.status(204).send("Request body is empty.");
               return;
           }
@@ -68,6 +71,7 @@ const addUser = async (req, res) => {
           );
         
           if (extraFields.length > 0) {
+              logger.warn("Additional fields are not allowed.");
               res.status(400).send("Additional fields are not allowed.");
               return;
           }
@@ -77,6 +81,7 @@ const addUser = async (req, res) => {
               !isAlphaString(req.body.first_name) ||
               !isAlphaString(req.body.last_name)
           ) {
+              logger.warn("Invalid format for first_name or last_name.");
               res.status(400).send("Invalid format for first_name or last_name.");
               return;
           } else {
