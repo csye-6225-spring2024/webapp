@@ -82,7 +82,7 @@ build {
       "sudo bash add-google-cloud-ops-agent-repo.sh --also-install",
       "sudo systemctl enable --now google-cloud-ops-agent",
       "sudo mv /tmp/config.yaml /etc/google-cloud-ops-agent/config.yaml",
-      "sudo systemctl restart google-cloud-ops-agent"
+      // "sudo systemctl restart google-cloud-ops-agent"
       // "sudo chown csye6225:csye6225 /var/log/",
       // "sudo mkdir /var/log/webapp",
       // "sudo chown csye6225:csye6225 /var/log/webapp",
