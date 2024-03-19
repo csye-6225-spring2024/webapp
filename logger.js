@@ -16,19 +16,20 @@
 // logger.warn('This is a warning message');
 
 
- import winston from 'winston';
- import dotenv from "dotenv";
- dotenv.config();
- 
- const logger = winston.createLogger({
-   format: winston.format.combine(
-     winston.format.timestamp(),
-     winston.format.simple()
-   ),
-   transports: [
-     new winston.transports.Console(),
-     new winston.transports.File({ filename: process.env.LOGPATH??'./log/app.log'})
- 
+import winston from 'winston';
+import dotenv from "dotenv";
+dotenv.config();
+
+const logger = winston.createLogger({
+  format: winston.format.combine(
+    winston.format.timestamp(),
+    winston.format.printf(info => {
+      return `${info.timestamp} ${info.level}: ${info.message}`;
+    })
+  ),
+  transports: [
+    new winston.transports.Console(),
+    new winston.transports.File({ filename: process.env.LOGPATH ?? './log/app.log' })
   ]
 });
 
