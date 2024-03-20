@@ -38,6 +38,7 @@ const isAlphaString = (str) => {
   };
 
   const checkRequiredFields = (req, res, next) => {
+    info.debug('Checking required fields in the request body...');
     const requiredFields = ['first_name', 'last_name', 'password', 'username'];
     
     // Check if any of the required fields is missing in the request body
