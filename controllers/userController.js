@@ -2,6 +2,7 @@ import bcrypt from 'bcrypt';
 import User from '../models/userModel.js';
 import { dbConnection } from './healthController.js';
 import sequelize from '../config/dbConfig.js';
+import logger from '../logger.js';
 
 // Validators
 import emailValidator from 'email-validator';
@@ -26,7 +27,7 @@ passwdValidator
         return true;
     } catch (error) {
         console.error('Database Connectivity Error:', error);
-        //logger.error('Database Connectivity Error:', error);
+        logger.error('Database Connectivity Error:', error);
         return false; 
     }
 };
@@ -43,7 +44,7 @@ const isAlphaString = (str) => {
     const missingFields = requiredFields.filter(field => !(field in req.body));
     if (missingFields.length > 0) {
         res.status(400).send(`Required fields are missing: ${missingFields.join(', ')}.`);
-        //logger.warn(`Required fields are missing: ${missingFields.join(', ')}.`);
+        logger.warn(`Required fields are missing: ${missingFields.join(', ')}.`);
         return;
     }
     
@@ -59,7 +60,7 @@ const addUser = async (req, res) => {
           // Check if the request body is empty
           if (Object.keys(req.body).length === 0) {
               res.status(204).send("Request body is empty.");
-              //logger.debug("Request body is empty.");
+              logger.debug("Request body is empty.");
               return;
           }ss
         
@@ -72,7 +73,7 @@ const addUser = async (req, res) => {
         
           if (extraFields.length > 0) {
               res.status(400).send("Additional fields are not allowed.");
-              //logger.warn("Additional fields are not allowed.");
+              logger.warn("Additional fields are not allowed.");
               return;
           }
         
@@ -82,7 +83,7 @@ const addUser = async (req, res) => {
               !isAlphaString(req.body.last_name)
           ) {
               res.status(400).send("Invalid format for first_name or last_name.");
-              //logger.warn("Invalid format for first_name or last_name.");
+              logger.warn("Invalid format for first_name or last_name.");
               return;
           } else {
               const salt = await bcrypt.genSalt(10);
@@ -100,7 +101,7 @@ const addUser = async (req, res) => {
                   !passwdValidator.validate(`${req.body.password}`)
               ) {
                   res.status(400).send("Invalid email or password format.");
-                  //logger.warn("Invalid email or password format.");
+                  logger.warn("Invalid email or password format.");
                   return;
               }
 
