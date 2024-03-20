@@ -133,6 +133,7 @@ const addUser = async (req, res) => {
                       account_updated: user.account_updated,
                   };
                   res.status(201).json(userInput);
+                  logger.info("User details updated sucessfully.");
               } else {
                   res.status(400).send("User already exists.");
               }
@@ -189,6 +190,7 @@ const getUser = async (req, res) => {
         };
 
         res.status(200).json(userInput);
+        logger.info("User Created.");
       } else {
         res.status(401).send("Invalid password.");
       }
