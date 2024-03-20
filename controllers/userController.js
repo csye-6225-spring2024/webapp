@@ -99,11 +99,13 @@ const addUser = async (req, res) => {
                   !emailValidator.validate(`${req.body.username}`) ||
                   !passwdValidator.validate(`${req.body.password}`)
               ) {
+                  logger.warn("Invalid email or password format.");
                   res.status(400).send("Invalid email or password format.");
                   return;
               }
 
               if (req.headers.authorization) {
+                  logger.warn("Authorization is not supported for this method.");
                   res.status(403).send("Authorization is not supported for this method.");
                   return;
               }  
@@ -157,6 +159,7 @@ const addUser = async (req, res) => {
 
   // Check if the authorization header is undefined
   if (req.headers.authorization === undefined) {
+    logger.error("Authorization header is missing.");
     res.status(403).send("Authorization header is missing.");
   } else {
     // Retrieve the encoded value in the format of 'basic <Token>' and extract only the <token>.

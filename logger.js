@@ -22,9 +22,9 @@ dotenv.config();
 
 const logger = winston.createLogger({
   format: winston.format.combine(
-    winston.format.timestamp(),
+    winston.format.timestamp({ format: 'YYYY-MM-DDTHH:mm:ss.SSSZ' }),
     winston.format.printf(info => {
-      return `${info.timestamp} ${info.level}: ${info.message}`;
+      return `${info.timestamp} ${info.level.toUpperCase()}: ${info.message}`;
     })
   ),
   transports: [
@@ -34,5 +34,6 @@ const logger = winston.createLogger({
 });
 
 export default logger;
+
 
 
