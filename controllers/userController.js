@@ -143,7 +143,7 @@ const addUser = async (req, res) => {
 
 
 // Fetching user details following basic authentication.
-    const getUser = async (req, res) => {
+const getUser = async (req, res) => {
     //     console.log(req.body !== '');
     //     if (req.method === 'GET' && req.body !== '') {
     //         // if (req.body && Object.keys(req.body).length > 0) {
@@ -159,7 +159,6 @@ const addUser = async (req, res) => {
 
   // Check if the authorization header is undefined
   if (req.headers.authorization === undefined) {
-    logger.error("Authorization header is missing.");
     res.status(403).send("Authorization header is missing.");
   } else {
     // Retrieve the encoded value in the format of 'basic <Token>' and extract only the <token>.
@@ -174,7 +173,6 @@ const addUser = async (req, res) => {
     const findUser = await User.findOne({
       where: { username: username },
     });
-
 
     if (findUser !== null) {
       if (await bcrypt.compare(password, findUser.password)) {
