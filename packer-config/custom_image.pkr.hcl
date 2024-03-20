@@ -72,23 +72,21 @@ build {
   provisioner "shell" {
     script = "packer-config/configure_systemd.sh"
   }
+  provisioner "shell" {
+    inline = [
+      "curl -sSO https://dl.google.com/cloudagents/add-google-cloud-ops-agent-repo.sh",
+      "sudo bash add-google-cloud-ops-agent-repo.sh --also-install",
+      "sudo mkdir -p /etc/google-cloud-ops-agent/",
+    ]
+  }
   provisioner "file" {
-    source      = "packer-config/config.yaml"
+    source      = "packer-config/ops-agent-config.yaml"
     destination = "/tmp/config.yaml"
   }
   provisioner "shell" {
     inline = [
       "sudo mv /tmp/config.yaml /etc/google-cloud-ops-agent/config.yaml",
-      "sudo curl -sSO https://dl.google.com/cloudagents/add-google-cloud-ops-agent-repo.sh",
-      "sudo bash add-google-cloud-ops-agent-repo.sh --also-install",
-      // "sudo systemctl enable --now google-cloud-ops-agent",
-      // "sudo systemctl restart google-cloud-ops-agent"
-      // "sudo chown csye6225:csye6225 /var/log/",
-      // "sudo mkdir /var/log/webapp",
-      // "sudo chown csye6225:csye6225 /var/log/webapp",
-      // "sudo chmod 755 /var/log/webapp"
-      //"sudo systemctl restart google-cloud-ops-agent"
-
+      "sudo systemctl restart google-cloud-ops-agent",
     ]
   }
 }
