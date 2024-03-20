@@ -38,7 +38,7 @@ const isAlphaString = (str) => {
   };
 
   const checkRequiredFields = (req, res, next) => {
-    //info.debug('Checking required fields in the request body...');
+    //logger.debug('Checking required fields in the request body...');
     const requiredFields = ['first_name', 'last_name', 'password', 'username'];
     
     // Check if any of the required fields is missing in the request body
@@ -52,14 +52,16 @@ const isAlphaString = (str) => {
 };
 
 const addUser = async (req, res) => {
+    logger.debug('Processing user addition...');
   // Check if the request method is POST
   if (req.method === 'POST') {
       // Execute the checkRequiredFields middleware before processing the request
       checkRequiredFields(req, res, async () => {
+        
           // Check if the request body is empty
           if (Object.keys(req.body).length === 0) {
               res.status(204).send("Request body is empty.");
-              //logger.debug("Request body is empty.");
+              logger.warn("Request body is empty.");
               return;
           }
         
@@ -82,7 +84,7 @@ const addUser = async (req, res) => {
               !isAlphaString(req.body.last_name)
           ) {
               res.status(400).send("Invalid format for first_name or last_name.");
-              logger.warn("Invalid format for first_name or last_name.");
+              logger.error("Invalid format for first_name or last_name.");
               return;
           } else {
               const salt = await bcrypt.genSalt(10);
@@ -100,7 +102,7 @@ const addUser = async (req, res) => {
                   !passwdValidator.validate(`${req.body.password}`)
               ) {
                   res.status(400).send("Invalid email or password format.");
-                  logger.warn("Invalid email or password format.");
+                  logger.error("Invalid email or password format.");
                   return;
               }
 
@@ -134,6 +136,7 @@ const addUser = async (req, res) => {
                   logger.info("User details updated sucessfully.");
               } else {
                   res.status(400).send("User already exists.");
+                  logger.error("User details updated sucessfully.");
               }
           }
       });
@@ -145,6 +148,7 @@ const addUser = async (req, res) => {
 
 // Fetching user details following basic authentication.
 const getUser = async (req, res) => {
+    logger.debug('Fetching user details...');
     //     console.log(req.body !== '');
     //     if (req.method === 'GET' && req.body !== '') {
     //         // if (req.body && Object.keys(req.body).length > 0) {
@@ -155,6 +159,7 @@ const getUser = async (req, res) => {
   const isDBConnected = await dbConnectionCheck();
           if (!isDBConnected) {
               res.status(503).send("Database Connectivity Error");
+              logger.error("DB Connection error");
               return;
           }
 
@@ -195,32 +200,34 @@ const getUser = async (req, res) => {
     } else {
       // User not found in the database
       res.status(404).send("User not found.");
+      logger.error("User not found.");
     }
   }
 };
 
 
 const updateUser = async (req, res) => {
+    logger.debug('Processing user updation...');
   // Check if request body is empty
   if (Object.keys(req.body).length === 0) {
       res.status(400).send("Request body is empty.");
-      logger.warn("Request body is empty.");
+      logger.error("Request body is empty.");
       return;
   }
   if (req.body.first_name === "" || req.body.last_name === "" || req.body.password === "") {
     if (req.body.first_name === "") {
         res.status(400).send("First name cannot be empty.");
-        logger.warn("First name cannot be empty."); 
+        logger.error("First name cannot be empty."); 
         return;
     }
     if (req.body.last_name === "") {
         res.status(400).send("Last name cannot be empty.");
-        logger.warn("Last name cannot be empty.");
+        logger.error("Last name cannot be empty.");
         return;
     }
     if (req.body.password === "") {
         res.status(400).send("Password cannot be empty.");
-        logger.warn("Password cannot be empty."); 
+        logger.error("Password cannot be empty."); 
         return;
     }
 }
@@ -229,7 +236,7 @@ const updateUser = async (req, res) => {
   const invalidFields = Object.keys(req.body).filter(field => !["password", "first_name", "last_name"].includes(field));
   if (invalidFields.length > 0) {
       res.status(400).send(`Invalid fields: ${invalidFields.join(", ")}. Only password, first_name, and last_name are allowed.`);
-      logger.warn(`Invalid fields: ${invalidFields.join(", ")}.`);
+      logger.error(`Invalid fields: ${invalidFields.join(", ")}.`);
       return;
   }
 
@@ -259,6 +266,7 @@ const updateUser = async (req, res) => {
       where: { username: username },
   });
 
+
   if (findUser !== null) {
     if (await bcrypt.compare(password, findUser.password)) {
         // Validate password format if provided
@@ -276,6 +284,7 @@ const updateUser = async (req, res) => {
         }
 
         // Update user
+        logger.debug('Updating user...');
         const updateData = {
             first_name: `${req.body.first_name || findUser.first_name}`,
             last_name: `${req.body.last_name || findUser.last_name}`,
@@ -290,11 +299,11 @@ const updateUser = async (req, res) => {
         logger.info("User updated successfully."); 
     } else {
         res.status(401).send("Unauthorized access.");
-        logger.warn("Unauthorized access.");
+        logger.error("Unauthorized access.");
     }
 } else {
     res.status(401).send("Unauthorized access.");
-    logger.warn("Unauthorized access.");
+    logger.error("Unauthorized access.");
 }
 }
 export { addUser, getUser, updateUser };
