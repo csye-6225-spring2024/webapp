@@ -18,7 +18,7 @@ Method: GET
 •  This endpoint functions as a health indicator for the application. A "200 OK" response confirms its successful operation. For other endpoints accessed using the GET method, a "404 Not Found" response will be returned if they are not implemented.
  
  Other request
-•  The API requests for POST, DELETE, PUT, and PATCH methods are not configured as per the specifications. Thus, attempting to use these requests will lead to a "405 Method Not Allowed" response, regardless of the database connection status.
+•  The API requests for POST, DELETE, PUT, and PATCH methods are not configured as per the specifications. Thus, attempting to use these requests will lead to a "405 Method Not Allowed" response, regardless of the database connection status..
 
  
 ## Assignment 02:
