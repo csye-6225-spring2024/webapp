@@ -1,4 +1,5 @@
 import sequelize from '../config/dbConfig.js';
+import logger from '../logger.js';
 
 
 // Checks database connectivity for all methods
