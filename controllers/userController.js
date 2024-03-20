@@ -26,7 +26,7 @@ passwdValidator
         return true;
     } catch (error) {
         console.error('Database Connectivity Error:', error);
-        logger.error('Database Connectivity Error:', error);
+        //logger.error('Database Connectivity Error:', error);
         return false; 
     }
 };
@@ -43,7 +43,7 @@ const isAlphaString = (str) => {
     const missingFields = requiredFields.filter(field => !(field in req.body));
     if (missingFields.length > 0) {
         res.status(400).send(`Required fields are missing: ${missingFields.join(', ')}.`);
-        logger.warn(`Required fields are missing: ${missingFields.join(', ')}.`);
+        //logger.warn(`Required fields are missing: ${missingFields.join(', ')}.`);
         return;
     }
     
@@ -59,7 +59,7 @@ const addUser = async (req, res) => {
           // Check if the request body is empty
           if (Object.keys(req.body).length === 0) {
               res.status(204).send("Request body is empty.");
-              logger.debug("Request body is empty.");
+              //logger.debug("Request body is empty.");
               return;
           }ss
         
@@ -72,7 +72,7 @@ const addUser = async (req, res) => {
         
           if (extraFields.length > 0) {
               res.status(400).send("Additional fields are not allowed.");
-              logger.warn("Additional fields are not allowed.");
+              //logger.warn("Additional fields are not allowed.");
               return;
           }
         
@@ -82,7 +82,7 @@ const addUser = async (req, res) => {
               !isAlphaString(req.body.last_name)
           ) {
               res.status(400).send("Invalid format for first_name or last_name.");
-              logger.warn("Invalid format for first_name or last_name.");
+              //logger.warn("Invalid format for first_name or last_name.");
               return;
           } else {
               const salt = await bcrypt.genSalt(10);
@@ -100,13 +100,13 @@ const addUser = async (req, res) => {
                   !passwdValidator.validate(`${req.body.password}`)
               ) {
                   res.status(400).send("Invalid email or password format.");
-                  logger.warn("Invalid email or password format.");
+                  //logger.warn("Invalid email or password format.");
                   return;
               }
 
               if (req.headers.authorization) {
                   res.status(403).send("Authorization is not supported for this method.");
-                  logger.warn("Authorization is not supported for this method.");
+                  //logger.warn("Authorization is not supported for this method.");
                   return;
               }  
               // Check database connection before proceeding
@@ -160,7 +160,7 @@ const getUser = async (req, res) => {
   // Check if the authorization header is undefined
   if (req.headers.authorization === undefined) {
     res.status(403).send("Authorization header is missing.");
-    logger.error("Authorization header is missing.");
+    //logger.error("Authorization header is missing.");
   } else {
     // Retrieve the encoded value in the format of 'basic <Token>' and extract only the <token>.
     var encoded = req.headers.authorization.split(' ')[1];
@@ -202,23 +202,23 @@ const updateUser = async (req, res) => {
   // Check if request body is empty
   if (Object.keys(req.body).length === 0) {
       res.status(400).send("Request body is empty.");
-      logger.warn("Request body is empty.");
+      //logger.warn("Request body is empty.");
       return;
   }
   if (req.body.first_name === "" || req.body.last_name === "" || req.body.password === "") {
     if (req.body.first_name === "") {
         res.status(400).send("First name cannot be empty.");
-        logger.warn("First name cannot be empty."); 
+        //logger.warn("First name cannot be empty."); 
         return;
     }
     if (req.body.last_name === "") {
         res.status(400).send("Last name cannot be empty.");
-        logger.warn("Last name cannot be empty.");
+        //logger.warn("Last name cannot be empty.");
         return;
     }
     if (req.body.password === "") {
         res.status(400).send("Password cannot be empty.");
-        logger.warn("Password cannot be empty."); 
+        //logger.warn("Password cannot be empty."); 
         return;
     }
 }
@@ -227,14 +227,14 @@ const updateUser = async (req, res) => {
   const invalidFields = Object.keys(req.body).filter(field => !["password", "first_name", "last_name"].includes(field));
   if (invalidFields.length > 0) {
       res.status(400).send(`Invalid fields: ${invalidFields.join(", ")}. Only password, first_name, and last_name are allowed.`);
-      logger.warn(`Invalid fields: ${invalidFields.join(", ")}.`);
+      //logger.warn(`Invalid fields: ${invalidFields.join(", ")}.`);
       return;
   }
 
   // Check if authorization header is missing
   if (!req.headers.authorization) {
       res.status(401).send("Authorization header is missing.");
-      logger.error("Authorization header is missing.");
+      //logger.error("Authorization header is missing.");
       return;
   }
 
@@ -242,7 +242,7 @@ const updateUser = async (req, res) => {
   const isDBConnected = await dbConnectionCheck();
   if (!isDBConnected) {
       res.status(503).send("Database Connectivity Error.");
-      logger.error("Database Connectivity Error.");
+      //logger.error("Database Connectivity Error.");
       return;
   }
 
@@ -262,7 +262,7 @@ const updateUser = async (req, res) => {
         // Validate password format if provided
         if (req.body.password && !passwdValidator.validate(`${req.body.password}`)) {
             res.status(400).send("Invalid password format.");
-            logger.warn("Invalid password format.");
+            //logger.warn("Invalid password format.");
             return;
         }
 
@@ -285,14 +285,14 @@ const updateUser = async (req, res) => {
 
         await findUser.update(updateData);
         res.status(204).send("User updated successfully.");
-        logger.info("User updated successfully."); 
+        //logger.info("User updated successfully."); 
     } else {
         res.status(401).send("Unauthorized access.");
-        logger.warn("Unauthorized access.");
+        //logger.warn("Unauthorized access.");
     }
 } else {
     res.status(401).send("Unauthorized access.");
-    logger.warn("Unauthorized access.");
+    //logger.warn("Unauthorized access.");
 }
 }
 export { addUser, getUser, updateUser };
