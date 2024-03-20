@@ -1,9 +1,8 @@
-import logger from "../logger";
 const handlePayloadChecks = (req, res, next) => {
 
     // Check if 'content-length' header is present and greater than 0
     if (req.headers['content-length'] && req.headers['content-length'] > 0) {
-        logger.warn('Content length header present and greater than 0.');
+        //logger.warn('Content length header present and greater than 0.');
         return res
             .status(400)
             .set("Cache-Control", "no-cache, no-store, must-revalidate")
