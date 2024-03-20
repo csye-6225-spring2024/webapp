@@ -60,9 +60,9 @@ const addUser = async (req, res) => {
           // Check if the request body is empty
           if (Object.keys(req.body).length === 0) {
               res.status(204).send("Request body is empty.");
-              logger.debug("Request body is empty.");
+              //logger.debug("Request body is empty.");
               return;
-          }ss
+          }
         
           const allowedFields = ['first_name', 'last_name', 'username', 'password', 'account_created', 'account_updated'];
         
