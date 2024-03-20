@@ -8,7 +8,7 @@ logging:
   processors:
     my-app-processor:
       type: parse_json
-      time_key: jsonPayload.timestamp
+      time_key: timestamp
       time_format: "YYYY-MM-DDTHH:mm:ss.SSSZ"
     move_severity:
       type: modify_fields
