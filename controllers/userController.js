@@ -48,8 +48,6 @@ const isAlphaString = (str) => {
         logger.warn(`Required fields are missing: ${missingFields.join(', ')}.`);
         return;
     }
-    
-    // Proceed to the next middleware or route handler
     next();
 };
 
