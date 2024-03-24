@@ -3,6 +3,15 @@ import User from '../models/userModel.js';
 import { dbConnection } from './healthController.js';
 import sequelize from '../config/dbConfig.js';
 import logger from '../logger.js';
+import { PubSub } from '@google-cloud/pubsub';
+import { v4 as uuidv4 } from 'uuid'; 
+
+
+const generateUUID = () => {
+    return uuidv4();
+};
+
+
 
 // Validators
 import emailValidator from 'email-validator';
@@ -51,123 +60,151 @@ const isAlphaString = (str) => {
     next();
 };
 
+
+
+const pubsub = new PubSub(); 
+
 const addUser = async (req, res) => {
     logger.debug('Processing user addition...');
-  // Check if the request method is POST
-  if (req.method === 'POST') {
-      // Execute the checkRequiredFields middleware before processing the request
-      checkRequiredFields(req, res, async () => {
-        
-          // Check if the request body is empty
-          if (Object.keys(req.body).length === 0) {
-              res.status(204).send("Request body is empty.");
-              logger.warn("Request body is empty.");
-              return;
-          }
-        
-          const allowedFields = ['first_name', 'last_name', 'username', 'password', 'account_created', 'account_updated'];
-        
-          // Check for any additional fields in the request body
-          const extraFields = Object.keys(req.body).filter(
-              (field) => !allowedFields.includes(field)
-          );
-        
-          if (extraFields.length > 0) {
-              res.status(400).send("Additional fields are not allowed.");
-              logger.warn("Additional fields are not allowed.");
-              return;
-          }
-        
-          // Validating first_name and last_name format
-          if (
-              !isAlphaString(req.body.first_name) ||
-              !isAlphaString(req.body.last_name)
-          ) {
-              res.status(400).send("Invalid format for first_name or last_name.");
-              logger.error("Invalid format for first_name or last_name.");
-              return;
-          } else {
-              const salt = await bcrypt.genSalt(10);
-              const hashPassword = await bcrypt.hash(req.body.password, salt);
-          
-              const details = {
-                  username: req.body.username,
-                  last_name: req.body.last_name,
-                  first_name: req.body.first_name,
-                  password: hashPassword,
-              };
-          
-              if (
-                  !emailValidator.validate(`${req.body.username}`) ||
-                  !passwdValidator.validate(`${req.body.password}`)
-              ) {
-                  res.status(400).send("Invalid email or password format.");
-                  logger.error("Invalid email or password format.");
-                  return;
-              }
+    // Check if the request method is POST
+    if (req.method === 'POST') {
+        // Execute the checkRequiredFields middleware before processing the request
+        checkRequiredFields(req, res, async () => {
 
-              if (req.headers.authorization) {
-                  res.status(403).send("Authorization is not supported for this method.");
-                  logger.warn("Authorization is not supported for this method.");
-                  return;
-              }  
-              // Check database connection before proceeding
-              const isDBConnected = await dbConnectionCheck();
-              if (!isDBConnected) {
-                  res.status(503).send("Database Connectivity Error");
-                  return;
-              }
-                  
-              const findUser = await User.findOne({
-                  where: { username: `${req.body.username}` },
-              });
+            // Check if the request body is empty
+            if (Object.keys(req.body).length === 0) {
+                res.status(204).send("Request body is empty.");
+                logger.warn("Request body is empty.");
+                return;
+            }
 
-              if (findUser === null) {
-                  const user = await User.create(details);
-                  const userInput = {
-                      id: user.id,
-                      username: user.username,
-                      first_name: user.first_name,
-                      last_name: user.last_name,
-                      account_created: user.account_created,
-                      account_updated: user.account_updated,
-                  };
-                  res.status(201).json(userInput);
-                  logger.info("User details updated sucessfully.");
-              } else {
-                  res.status(400).send("User already exists.");
-                  logger.error("User details updated sucessfully.");
-              }
-          }
-      });
-  } else {       
-      res.status(405).send("Method Not Allowed");
-  }
+            const allowedFields = ['first_name', 'last_name', 'username', 'password', 'account_created', 'account_updated'];
+
+            // Check for any additional fields in the request body
+            const extraFields = Object.keys(req.body).filter(
+                (field) => !allowedFields.includes(field)
+            );
+
+            if (extraFields.length > 0) {
+                res.status(400).send("Additional fields are not allowed.");
+                logger.warn("Additional fields are not allowed.");
+                return;
+            }
+
+            // Validating first_name and last_name format
+            if (
+                !isAlphaString(req.body.first_name) ||
+                !isAlphaString(req.body.last_name)
+            ) {
+                res.status(400).send("Invalid format for first_name or last_name.");
+                logger.error("Invalid format for first_name or last_name.");
+                return;
+            } else {
+                const salt = await bcrypt.genSalt(10);
+                const hashPassword = await bcrypt.hash(req.body.password, salt);
+
+                const details = {
+                    username: req.body.username,
+                    last_name: req.body.last_name,
+                    first_name: req.body.first_name,
+                    password: hashPassword, 
+                };
+
+                if (
+                    !emailValidator.validate(`${req.body.username}`) ||
+                    !passwdValidator.validate(`${req.body.password}`)
+                ) {
+                    res.status(400).send("Invalid email or password format.");
+                    logger.error("Invalid email or password format.");
+                    return;
+                }
+
+                if (req.headers.authorization) {
+                    res.status(403).send("Authorization is not supported for this method.");
+                    logger.warn("Authorization is not supported for this method.");
+                    return;
+                }
+                // Check database connection before proceeding
+                const isDBConnected = await dbConnectionCheck();
+                if (!isDBConnected) {
+                    res.status(503).send("Database Connectivity Error");
+                    return;
+                }
+
+                const findUser = await User.findOne({
+                    where: { username: `${req.body.username}` },
+                });
+
+                if (findUser === null) {
+                    const token = generateUUID();  
+                    
+                    const currTime = new Date(Date.now()); 
+                    const user = await User.create(details); 
+
+                    // Publish message to Pub/Sub topic
+                    const message = {
+                        id: user.id,
+                        username: user.username,
+                        first_name: user.first_name,
+                        last_name: user.last_name,
+                        account_created: user.account_created,
+                        account_updated: user.account_updated,
+                    };
+                    await publishMessage(message);
+
+                    const userInput = {
+                        id: user.id,
+                        username: user.username,
+                        first_name: user.first_name,
+                        last_name: user.last_name,
+                        account_created: user.account_created,
+                        account_updated: user.account_updated,
+                    };
+                    res.status(201).json(userInput);
+                    logger.info("User details updated successfully.");
+                } else {
+                    res.status(400).send("User already exists.");
+                    logger.error("User already exists.");
+                }
+            }
+        });
+    } else {
+        res.status(405).send("Method Not Allowed");
+    }
 };
+
+// Function to publish message to Pub/Sub topic
+async function publishMessage(message) {
+    const dataBuffer = Buffer.from(JSON.stringify(message));
+    try {
+        await pubsub.topic('verify_email').publish(dataBuffer);
+        console.log('Message published successfully');
+    } catch (error) {
+        console.error('Error publishing message:', error);
+    }
+}
 
 
 // Fetching user details following basic authentication.
 const getUser = async (req, res) => {
     logger.debug('Fetching user details...');
-    //     console.log(req.body !== '');
-    //     if (req.method === 'GET' && req.body !== '') {
-    //         // if (req.body && Object.keys(req.body).length > 0) {
-    //             res.status(400).send("Request body should be empty for GET requests.");
-    //             return;
-    //         // }
-    // } 
-  const isDBConnected = await dbConnectionCheck();
-          if (!isDBConnected) {
-              res.status(503).send("Database Connectivity Error");
-              logger.error("DB Connection error");
-              return;
-          }
+    if (Object.keys(req.body).length !== 0) {
+        res.status(400).send("Request body should be empty for GET requests.");
+        logger.warn("Request body is not empty for a GET request.");
+        return;
+    }
+const isDBConnected = await dbConnectionCheck();
+        if (!isDBConnected) {
+            res.status(503).send("Database Connectivity Error");
+            logger.error("DB Connection error");
+            return;
+        }
 
-  // Check if the authorization header is undefined
-  if (req.headers.authorization === undefined) {
+// Check if the authorization header is undefined
+if (req.headers.authorization === undefined) {
     res.status(403).send("Authorization header is missing.");
     logger.error("Authorization header is missing.");
-  } else {
+} else {
     // Retrieve the encoded value in the format of 'basic <Token>' and extract only the <token>.
     var encoded = req.headers.authorization.split(' ')[1];
     // Decode it utilizing base64
@@ -178,43 +215,43 @@ const getUser = async (req, res) => {
 
     // Verify if the provided username corresponds to the records in our database.
     const findUser = await User.findOne({
-      where: { username: username },
+    where: { username: username },
     });
 
     if (findUser !== null) {
-      if (await bcrypt.compare(password, findUser.password)) {
+    if (await bcrypt.compare(password, findUser.password)) {
         let userInput = {
-          id: findUser.id,
-          username: findUser.username,
-          first_name: findUser.first_name,
-          last_name: findUser.last_name,
-          account_created: findUser.account_created,
-          account_updated: findUser.account_updated,
+        id: findUser.id,
+        username: findUser.username,
+        first_name: findUser.first_name,
+        last_name: findUser.last_name,
+        account_created: findUser.account_created,
+        account_updated: findUser.account_updated,
         };
 
         res.status(200).json(userInput);
         logger.info("User Created.");
-      } else {
-        res.status(401).send("Invalid password.");
-      }
     } else {
-      // User not found in the database
-      res.status(404).send("User not found.");
-      logger.error("User not found.");
+        res.status(401).send("Invalid password.");
     }
-  }
+    } else {
+    // User not found in the database
+    res.status(404).send("User not found.");
+    logger.error("User not found.");
+    }
+}
 };
 
 
 const updateUser = async (req, res) => {
     logger.debug('Processing user updation...');
-  // Check if request body is empty
-  if (Object.keys(req.body).length === 0) {
-      res.status(400).send("Request body is empty.");
-      logger.error("Request body is empty.");
-      return;
-  }
-  if (req.body.first_name === "" || req.body.last_name === "" || req.body.password === "") {
+// Check if request body is empty
+if (Object.keys(req.body).length === 0) {
+    res.status(400).send("Request body is empty.");
+    logger.error("Request body is empty.");
+    return;
+}
+if (req.body.first_name === "" || req.body.last_name === "" || req.body.password === "") {
     if (req.body.first_name === "") {
         res.status(400).send("First name cannot be empty.");
         logger.error("First name cannot be empty."); 
@@ -232,42 +269,42 @@ const updateUser = async (req, res) => {
     }
 }
 
-  // Check for invalid fields in the payload
-  const invalidFields = Object.keys(req.body).filter(field => !["password", "first_name", "last_name"].includes(field));
-  if (invalidFields.length > 0) {
-      res.status(400).send(`Invalid fields: ${invalidFields.join(", ")}. Only password, first_name, and last_name are allowed.`);
-      logger.error(`Invalid fields: ${invalidFields.join(", ")}.`);
-      return;
-  }
+// Check for invalid fields in the payload
+const invalidFields = Object.keys(req.body).filter(field => !["password", "first_name", "last_name"].includes(field));
+if (invalidFields.length > 0) {
+    res.status(400).send(`Invalid fields: ${invalidFields.join(", ")}. Only password, first_name, and last_name are allowed.`);
+    logger.error(`Invalid fields: ${invalidFields.join(", ")}.`);
+    return;
+}
 
-  // Check if authorization header is missing
-  if (!req.headers.authorization) {
-      res.status(401).send("Authorization header is missing.");
-      logger.error("Authorization header is missing.");
-      return;
-  }
+// Check if authorization header is missing
+if (!req.headers.authorization) {
+    res.status(401).send("Authorization header is missing.");
+    logger.error("Authorization header is missing.");
+    return;
+}
 
-  // Check database connectivity
-  const isDBConnected = await dbConnectionCheck();
-  if (!isDBConnected) {
-      res.status(503).send("Database Connectivity Error.");
-      logger.error("Database Connectivity Error.");
-      return;
-  }
+// Check database connectivity
+const isDBConnected = await dbConnectionCheck();
+if (!isDBConnected) {
+    res.status(503).send("Database Connectivity Error.");
+    logger.error("Database Connectivity Error.");
+    return;
+}
 
-  // Decode the authorization header
-  const encoded = req.headers.authorization.split(" ")[1];
-  const decoded = Buffer.from(encoded, "base64").toString();
-  const username = decoded.split(":")[0];
-  const password = decoded.split(":")[1];
+// Decode the authorization header
+const encoded = req.headers.authorization.split(" ")[1];
+const decoded = Buffer.from(encoded, "base64").toString();
+const username = decoded.split(":")[0];
+const password = decoded.split(":")[1];
 
-  // Check if the passed username and password match with the values in our database
-  const findUser = await User.findOne({
-      where: { username: username },
-  });
+// Check if the passed username and password match with the values in our database
+const findUser = await User.findOne({
+    where: { username: username },
+});
 
 
-  if (findUser !== null) {
+if (findUser !== null) {
     if (await bcrypt.compare(password, findUser.password)) {
         // Validate password format if provided
         if (req.body.password && !passwdValidator.validate(`${req.body.password}`)) {
@@ -307,4 +344,3 @@ const updateUser = async (req, res) => {
 }
 }
 export { addUser, getUser, updateUser };
-
