@@ -39,10 +39,14 @@ const User = sequelize.define('User', {
       defaultValue:DataTypes.NOW,
       allowNull: true,  
       readOnly: true,
-    }
-    
+    },
+    email_verified: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
+      allowNull: true
+  }  
   },{
-    timestamps: false, // Remove createdAt and updatedAt fields
+    timestamps: false,
   });
   
-  export default User;
+  export default User; 
