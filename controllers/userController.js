@@ -139,7 +139,7 @@ const addUser = async (req, res) => {
                     const currTime = new Date(Date.now()); 
                     const user = await User.create(details); 
 
-                    Publish message to Pub/Sub topic
+                    //Publish message to Pub/Sub topic
                     const message = {
                         id: user.id,
                         username: user.username,
