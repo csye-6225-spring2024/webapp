@@ -140,15 +140,15 @@ const addUser = async (req, res) => {
                     const user = await User.create(details); 
 
                     // Publish message to Pub/Sub topic
-                    const message = {
-                        id: user.id,
-                        username: user.username,
-                        first_name: user.first_name,
-                        last_name: user.last_name,
-                        account_created: user.account_created,
-                        account_updated: user.account_updated,
-                    };
-                    await publishMessage(message);
+                    // const message = {
+                    //     id: user.id,
+                    //     username: user.username,
+                    //     first_name: user.first_name,
+                    //     last_name: user.last_name,
+                    //     account_created: user.account_created,
+                    //     account_updated: user.account_updated,
+                    // };
+                    // await publishMessage(message);
 
                     const userInput = {
                         id: user.id,
@@ -172,15 +172,15 @@ const addUser = async (req, res) => {
 };
 
 // Function to publish message to Pub/Sub topic
-async function publishMessage(message) {
-    const dataBuffer = Buffer.from(JSON.stringify(message));
-    try {
-        await pubsub.topic('verify_email').publish(dataBuffer);
-        console.log('Message published successfully');
-    } catch (error) {
-        console.error('Error publishing message:', error);
-    }
-}
+// async function publishMessage(message) {
+//     const dataBuffer = Buffer.from(JSON.stringify(message));
+//     try {
+//         await pubsub.topic('verify_email').publish(dataBuffer);
+//         console.log('Message published successfully');
+//     } catch (error) {
+//         console.error('Error publishing message:', error);
+//     }
+// }
 
 
 // Fetching user details following basic authentication.
