@@ -11,8 +11,6 @@ const generateUUID = () => {
     return uuidv4();
 };
 
-
-
 // Validators
 import emailValidator from 'email-validator';
 import passwordValidator from 'password-validator';
