@@ -39,21 +39,21 @@ const User = sequelize.define('User', {
       allowNull: true,  
       readOnly: true,
     },
-    is_verified: {
-      type: DataTypes.BOOLEAN,
-      defaultValue: false,
-      allowNull: false,
-    },
-    token: {
-      type: DataTypes.STRING, // Assuming token is a string, adjust data type if needed
-      allowNull: true,
-    },
-    validity: {
-      type: DataTypes.DATE,
-      //defaultValue: DataTypes,
-      allowNull: true,  
-      readOnly: true,
-    }
+    // is_verified: {
+    //   type: DataTypes.BOOLEAN,
+    //   defaultValue: false,
+    //   allowNull: false,
+    // },
+    // token: {
+    //   type: DataTypes.STRING,
+    //   allowNull: true,
+    // },
+    // validity: {
+    //   type: DataTypes.DATE,
+    //   //defaultValue: DataTypes,
+    //   allowNull: true,  
+    //   readOnly: true,
+    // }
   },{
     timestamps: false,
   });
