@@ -5,6 +5,7 @@ import { handlePayloadChecks } from './controllers/payload.js';
 import sequelize from './config/dbConfig.js';
 import router from './routes/userRoutes.js';
 import logger from './logger.js';
+import { verifyUser } from './controllers/userController.js';
 
 const app = express();
 
@@ -46,6 +47,8 @@ app.use('/healthz', (req, res, next) => {
   }
 });
 
+app.get('/verify', verifyUser) ;
+
 // Middleware to handle invalid query parameters
 app.use('/', (req, res, next) => {
   if (Object.keys(req.query).length > 0) {
@@ -69,6 +72,8 @@ app.use('/healthz', dbConnection);
 
 // Endpoint for health check
 app.get('/healthz', healthCheck);
+
+
 
 // Disable 'x-powered-by' header
 app.disable('x-powered-by');

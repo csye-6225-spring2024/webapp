@@ -58,12 +58,15 @@ const isAlphaString = (str) => {
     next();
 };
 
-
+const verifyUser = async (req, res) => {
+    console.log(req.query)
+    res.status(200).send(); 
+}
 
 const pubsub = new PubSub(); 
 
 const addUser = async (req, res) => {
-    logger.debug('Processing user addition...');
+    logger.debug('Processing user addition...'); 
     // Check if the request method is POST
     if (req.method === 'POST') {
         // Execute the checkRequiredFields middleware before processing the request
@@ -134,22 +137,19 @@ const addUser = async (req, res) => {
                 });
 
                 if (findUser === null) {
-                    const token = generateUUID();  
+                    //const token = generateUUID(); 
+                     //Publish message to Pub/Sub topic
+                     const message = {
+                        username: details.username, 
+                        token: generateUUID() 
+                    };
+                    await publishMessage(message); 
+                    console.log("published", new Date(Date.now()))
                     
                     const currTime = new Date(Date.now()); 
                     const user = await User.create(details); 
-
-                    //Publish message to Pub/Sub topic
-                    const message = {
-                        id: user.id,
-                        username: user.username,
-                        first_name: user.first_name,
-                        last_name: user.last_name,
-                        account_created: user.account_created,
-                        account_updated: user.account_updated,
-                    };
-                    await publishMessage(message);
-
+                    console.log("After user creation", new Date(Date.now()))
+                    
                     const userInput = {
                         id: user.id,
                         username: user.username,
@@ -158,6 +158,9 @@ const addUser = async (req, res) => {
                         account_created: user.account_created,
                         account_updated: user.account_updated,
                     };
+
+
+                    
                     res.status(201).json(userInput);
                     logger.info("User details updated successfully.");
                 } else {
@@ -175,7 +178,7 @@ const addUser = async (req, res) => {
 async function publishMessage(message) {
     const dataBuffer = Buffer.from(JSON.stringify(message));
     try {
-        await pubsub.topic('verify_email').publish(dataBuffer);
+        await pubsub.topic('verify_email').publish(dataBuffer); 
         console.log('Message published successfully');
     } catch (error) {
         console.error('Error publishing message:', error);
@@ -341,4 +344,4 @@ if (findUser !== null) {
     logger.error("Unauthorized access.");
 }
 }
-export { addUser, getUser, updateUser };
+export { addUser, getUser, updateUser, verifyUser };
