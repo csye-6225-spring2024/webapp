@@ -94,4 +94,4 @@ The workflow ensures that the application interacts correctly with the MySQL dat
 • For deploying the custom image in the GCP service account, necessary roles have been enabled, including Compute Engine • • • Instance Admin (v1) and Service Account User. The JSON key generated from the service account is downloaded and stored   securely as a secret in the organization's webapp repository.
 • Two workflows are established, named test-build and test-checker.
 • The test-checker workflow encompasses integration tests, building project artifacts, initializing Packer, formatting with Packer fmt, and validating with Packer validate.
-• The test-validator workflow includes integration tests, building project artifacts, authentication, initializing Packer, building the custom image, and automatically deploying it upon merge..
+• The test-validator workflow includes integration tests, building project artifacts, authentication, initializing Packer, building the custom image, and automatically deploying it upon merge.
