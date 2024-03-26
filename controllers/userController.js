@@ -59,26 +59,11 @@ const isAlphaString = (str) => {
 };
 
 const verifyUser = async (req, res) => {
+    console.log(req.query)
+    res.status(200).send();
     const { token, username } = req.query;
-    
-    try {
-        // Find the user by username
-        const user = await User.findOne({ where: { username } });
-
-        // Check if user exists and if the token matches
-        if (user && user.token === token) {
-            await user.update({ email_verified: true });
-
-            return res.status(200).json({ message: 'Email verified successfully' });
-        } else {
-            return res.status(401).json({ error: 'Invalid token or user not found' });
-        }
-    } catch (error) {
-        console.error('Error verifying user:', error);
-        return res.status(500).json({ error: 'Internal server error' });
-    }
-};
-
+    console.log(req.query)
+}
 
 const pubsub = new PubSub(); 
 const topicName = 'verify_email';
