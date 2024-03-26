@@ -145,7 +145,7 @@ const addUser = async (req, res) => {
                      //Publish message to Pub/Sub topic
                      const message = {
                         username: details.username, 
-                        token: generateUUID() 
+                        //token: generateUUID() 
                     };
                     await publishMessage(message); 
                     console.log("published", new Date(Date.now()))
