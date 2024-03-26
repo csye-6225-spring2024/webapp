@@ -64,6 +64,8 @@ const verifyUser = async (req, res) => {
 }
 
 const pubsub = new PubSub(); 
+const topicName = 'verify_email';
+
 
 const addUser = async (req, res) => {
     logger.debug('Processing user addition...'); 
@@ -178,7 +180,7 @@ const addUser = async (req, res) => {
 async function publishMessage(message) {
     const dataBuffer = Buffer.from(JSON.stringify(message));
     try {
-        await pubsub.topic('verify_email').publish(dataBuffer); 
+        await pubsub.topic(topicName).publish(dataBuffer); 
         console.log('Message published successfully');
     } catch (error) {
         console.error('Error publishing message:', error);
