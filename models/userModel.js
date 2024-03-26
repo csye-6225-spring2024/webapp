@@ -28,25 +28,34 @@ const User = sequelize.define('User', {
       //unique: true,
     },
     account_created: {
-
       type: DataTypes.DATE,   
-      defaultValue:DataTypes.NOW, 
+      defaultValue: DataTypes.NOW, 
       allowNull: true,
       readOnly: true,
     },
     account_updated: {
       type: DataTypes.DATE,
-      defaultValue:DataTypes.NOW,
+      defaultValue: DataTypes.NOW,
       allowNull: true,  
       readOnly: true,
     },
     email_verified: {
       type: DataTypes.BOOLEAN,
       defaultValue: false,
-      allowNull: true
-  }  
+      allowNull: true,
+    },
+    token: {
+      type: DataTypes.STRING, // Assuming token is a string, adjust data type if needed
+      allowNull: true,
+    },
+    validity: {
+      type: DataTypes.DATE,
+      //defaultValue: DataTypes,
+      allowNull: true,  
+      readOnly: true,
+    }
   },{
     timestamps: false,
   });
   
-  export default User; 
+  export default User;
