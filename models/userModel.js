@@ -39,10 +39,10 @@ const User = sequelize.define('User', {
       allowNull: true,  
       readOnly: true,
     },
-    email_verified: {
+    is_verified: {
       type: DataTypes.BOOLEAN,
       defaultValue: false,
-      allowNull: true,
+      allowNull: false,
     },
     token: {
       type: DataTypes.STRING, // Assuming token is a string, adjust data type if needed
