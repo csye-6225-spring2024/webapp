@@ -40,11 +40,11 @@ const User = sequelize.define('User', {
       allowNull: true,  
       readOnly: true,
     },
-  //   email_verified: {
-  //     type: DataTypes.BOOLEAN,
-  //     defaultValue: false,
-  //     allowNull: true
-  // }  
+    email_verified: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
+      allowNull: true
+  }  
   },{
     timestamps: false,
   });
