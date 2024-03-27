@@ -77,14 +77,13 @@ const verifyUser = async (req, res) => {
 
         if (currentTime < validityTime) {
             // Check if the user is already verified
-            if (user.is_verified) {
+            if (!user.is_verified) {
+                // Update user's verification status to true
+                await user.update({ is_verified: true });
+                return res.status(200).send("Email Verified");
+            } else {
                 return res.status(200).send("Already verified");
             }
-
-            // Update user's verification status to true
-            await user.update({ is_verified: true });
-
-            return res.status(200).send("Email Verified");
         } else {
             return res.status(400).send("Link Expired");
         }
@@ -93,6 +92,7 @@ const verifyUser = async (req, res) => {
         res.status(500).send("Internal Server Error");
     }
 };
+
 
 
 const pubsub = new PubSub(); 
@@ -249,20 +249,24 @@ if (req.headers.authorization === undefined) {
 
     // Verify if the provided username corresponds to the records in our database.
     const findUser = await User.findOne({
-    where: { username: username },
+        where: { username: username },
     });
 
     if (findUser !== null) {
-    if (await bcrypt.compare(password, findUser.password)) {
-        let userInput = {
-        id: findUser.id,
-        username: findUser.username,
-        first_name: findUser.first_name,
-        last_name: findUser.last_name,
-        account_created: findUser.account_created,
-        account_updated: findUser.account_updated,
-        };
-
+        if (await bcrypt.compare(password, findUser.password)) {
+            if (!findUser.is_verified) {
+                res.status(403).send("User account is not verified.");
+                logger.error("User account is not verified.");
+                return;
+            }
+            let userInput = {
+                id: findUser.id,
+                username: findUser.username,
+                first_name: findUser.first_name,
+                last_name: findUser.last_name,
+                account_created: findUser.account_created,
+                account_updated: findUser.account_updated,
+            };
         res.status(200).json(userInput);
         logger.info("User Created.");
     } else {
@@ -339,6 +343,11 @@ const findUser = await User.findOne({
 
 
 if (findUser !== null) {
+    if (!findUser.is_verified) {
+        res.status(403).send("User account is not verified. Unable to update details.");
+        logger.error("User account is not verified. Unable to update details.");
+        return;
+    } 
     if (await bcrypt.compare(password, findUser.password)) {
         // Validate password format if provided
         if (req.body.password && !passwdValidator.validate(`${req.body.password}`)) {
