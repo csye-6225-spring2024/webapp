@@ -1,5 +1,6 @@
 import axios from "axios";
 import { expect } from "chai";
+import User from "../../models/userModel";
  
 axios.defaults.baseURL = "http://localhost:8080";
  
