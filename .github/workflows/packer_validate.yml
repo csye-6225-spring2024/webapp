@@ -42,7 +42,7 @@ jobs:
           echo "DB=${{ secrets.DB }}" >> .env
           echo "HOST=${{ secrets.HOST }}" >> .env
           echo "DIALECT=${{ secrets.DIALECT }}" >> .env
-           echo "DIALECT=${{ secrets.NODE_ENV }}" >> .env
+          echo "NODE_ENV=${{ secrets.NODE_ENV }}" >> .env
  
       - name: Install Dependencies
         run: npm install
