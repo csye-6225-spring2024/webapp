@@ -13,6 +13,9 @@ describe("User Endpoint Integration Tests", () => {
       password: "Test@12345",
     });
     expect(createUserResponse.status).to.equal(201);
+
+  await findUser.update(updateData);
+
     const userId = createUserResponse.data.id;
     // Authenticate
     const authHeader = `Basic ${Buffer.from(

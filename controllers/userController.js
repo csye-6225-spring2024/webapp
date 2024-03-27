@@ -39,8 +39,8 @@ passwdValidator
     }
 };
 
-// const isTesting = process.env.NODE_ENV === 'test';
-// const isVerified = isTesting ? true : false;
+const isTesting = process.env.NODE_ENV === 'test';
+const isVerified = isTesting ? true : false;
 
 // Function to validate if a string contains only letters (no digits)
 const isAlphaString = (str) => {
@@ -62,12 +62,37 @@ const isAlphaString = (str) => {
 };
 
 const verifyUser = async (req, res) => {
-    console.log(req.query)
-    res.status(200).send("Email Verified");
-    const { token, username } = req.query;
-    console.log(req.query)
-}
+    try {
+        const { token, username } = req.query;
+        
+        // Retrieve the user from the database using the token and username
+        const user = await User.findOne({ where: { token, username } });
 
+        if (!user) {
+            return res.status(400).send("Invalid token or username");
+        }
+
+        const currentTime = new Date();
+        const validityTime = new Date(user.validity);
+
+        if (currentTime < validityTime) {
+            // Check if the user is already verified
+            if (user.is_verified) {
+                return res.status(200).send("Already verified");
+            }
+
+            // Update user's verification status to true
+            await user.update({ is_verified: true });
+
+            return res.status(200).send("Email Verified");
+        } else {
+            return res.status(400).send("Link Expired");
+        }
+    } catch (error) {
+        console.error("Error verifying user:", error);
+        res.status(500).send("Internal Server Error");
+    }
+};
 
 
 const pubsub = new PubSub(); 
@@ -148,11 +173,12 @@ const addUser = async (req, res) => {
                 if (findUser === null) {
                     //const token = generateUUID(); 
                      //Publish message to Pub/Sub topic
-                     const message = {
+                     if(!isTesting){ const message = {
                         username: details.username, 
+
                         //token: generateUUID() 
                     };
-                    await publishMessage(message); 
+                    await publishMessage(message); }
                     console.log("published", new Date(Date.now()))
                     
                     const currTime = new Date(Date.now()); 
@@ -330,6 +356,7 @@ if (findUser !== null) {
 
         // Update user
         logger.debug('Updating user...');
+        
         const updateData = {
             first_name: `${req.body.first_name || findUser.first_name}`,
             last_name: `${req.body.last_name || findUser.last_name}`,
