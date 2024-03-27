@@ -15,7 +15,7 @@ describe("User Endpoint Integration Tests", () => {
     });
     expect(createUserResponse.status).to.equal(201);
 
-    await User.update({ isVerified: true }, { where: { username: "test@gmail.com" } });
+    // await User.update({ isVerified: true }, { where: { username: "test@gmail.com" } });
 
     const userId = createUserResponse.data.id;
     // Authenticate

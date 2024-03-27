@@ -39,8 +39,6 @@ passwdValidator
     }
 };
 
-const isTesting = process.env.NODE_ENV === 'test';
-const isVerified = isTesting ? true : false;  
 
 // Function to validate if a string contains only letters (no digits)
 const isAlphaString = (str) => {
@@ -49,7 +47,7 @@ const isAlphaString = (str) => {
 
   const checkRequiredFields = (req, res, next) => {
     //logger.debug('Checking required fields in the request body...');
-    const requiredFields = ['first_name', 'last_name', 'password', 'username'];
+    const requiredFields = ['first_name', 'last_name', 'password', 'username' ];
     
     // Check if any of the required fields is missing in the request body
     const missingFields = requiredFields.filter(field => !(field in req.body));
@@ -102,6 +100,9 @@ const topicName = 'verify_email';
 const addUser = async (req, res) => {
     logger.debug('Processing user addition...'); 
     // Check if the request method is POST
+
+const isTesting = process.env.NODE_ENV === 'test';
+const is_verified = isTesting ? true : false;  
     if (req.method === 'POST') {
         // Execute the checkRequiredFields middleware before processing the request
         checkRequiredFields(req, res, async () => {
@@ -113,7 +114,7 @@ const addUser = async (req, res) => {
                 return;
             }
 
-            const allowedFields = ['first_name', 'last_name', 'username', 'password', 'account_created', 'account_updated'];
+            const allowedFields = ['first_name', 'last_name', 'username', 'password', 'account_created', 'account_updated', 'is_verified'];
 
             // Check for any additional fields in the request body
             const extraFields = Object.keys(req.body).filter(
@@ -143,6 +144,7 @@ const addUser = async (req, res) => {
                     last_name: req.body.last_name,
                     first_name: req.body.first_name,
                     password: hashPassword, 
+                    is_verified: is_verified
                 };
 
                 if (
@@ -192,6 +194,7 @@ const addUser = async (req, res) => {
                         last_name: user.last_name,
                         account_created: user.account_created,
                         account_updated: user.account_updated,
+                        is_verified: user.is_verified,
                         
                     };
                     res.status(201).json(userInput);
