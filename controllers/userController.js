@@ -74,7 +74,7 @@ const verifyUser = async (req, res) => {
 
         const currentTime = new Date();
         const validityTime = new Date(user.validity);
-
+        console.log(is_verified);
         if (currentTime < validityTime) {
             // Check if the user is already verified
             if (!user.is_verified) {
@@ -173,11 +173,11 @@ const addUser = async (req, res) => {
                 if (findUser === null) {
                     //const token = generateUUID(); 
                      //Publish message to Pub/Sub topic
-                     if(!isTesting){ const message = {
-                        username: details.username, 
-
-                        //token: generateUUID() 
-                    };
+                     if (details.username !== 'test@gmail.com') {
+                        const message = {
+                            username: details.username,
+                            //token: generateUUID() 
+                        };
                     await publishMessage(message); }
                     console.log("published", new Date(Date.now()))
                     
