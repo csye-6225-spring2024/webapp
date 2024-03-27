@@ -39,6 +39,9 @@ passwdValidator
     }
 };
 
+// const isTesting = process.env.NODE_ENV === 'test';
+// const isVerified = isTesting ? true : false;
+
 // Function to validate if a string contains only letters (no digits)
 const isAlphaString = (str) => {
     return nameValidator.isAlpha(str);
@@ -60,10 +63,12 @@ const isAlphaString = (str) => {
 
 const verifyUser = async (req, res) => {
     console.log(req.query)
-    res.status(200).send();
+    res.status(200).send("Email Verified");
     const { token, username } = req.query;
     console.log(req.query)
 }
+
+
 
 const pubsub = new PubSub(); 
 const topicName = 'verify_email';
@@ -161,10 +166,8 @@ const addUser = async (req, res) => {
                         last_name: user.last_name,
                         account_created: user.account_created,
                         account_updated: user.account_updated,
+                        
                     };
-
-
-                    
                     res.status(201).json(userInput);
                     logger.info("User details updated successfully.");
                 } else {

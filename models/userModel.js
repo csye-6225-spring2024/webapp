@@ -7,7 +7,6 @@ const User = sequelize.define('User', {
       primaryKey: true,
       defaultValue: DataTypes.UUIDV4,
       allowNull: false,
-      readOnly: true,
     },
     first_name: {
       type: DataTypes.STRING,
@@ -20,24 +19,19 @@ const User = sequelize.define('User', {
     password: {
       type: DataTypes.STRING,
       allowNull: false, 
-      writeOnly: true,
     },
     username: {
       type: DataTypes.STRING,   
       allowNull: false,
-      //unique: true,
     },
     account_created: {
       type: DataTypes.DATE,   
       defaultValue: DataTypes.NOW, 
-      allowNull: true,
-      readOnly: true,
     },
     account_updated: {
       type: DataTypes.DATE,
       defaultValue: DataTypes.NOW,
       allowNull: true,  
-      readOnly: true,
     },
     is_verified: {
       type: DataTypes.BOOLEAN,
@@ -50,12 +44,18 @@ const User = sequelize.define('User', {
     },
     validity: {
       type: DataTypes.DATE,
-      //defaultValue: DataTypes,
-      allowNull: true,  
-      readOnly: true,
+      allowNull: true,
     }
   },{
     timestamps: false,
+  });
+  
+  User.sync({ alter: true })
+  .then(() => {
+    console.log('Model synchronized successfully');
+  })
+  .catch(err => {
+    console.error('Error synchronizing model:', err);
   });
   
   export default User;
