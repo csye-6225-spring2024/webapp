@@ -22,7 +22,6 @@ describe("User Endpoint Integration Tests", () => {
       "test@gmail.com:Test@12345"
     ).toString("base64")}`;
     // Send a GET request
-    await User.update({ iis_verified: true }, { where: { username: userData.username } });
     const getUserResponse = await axios.get("/v1/user/self", {
       headers: {
         Authorization: authHeader,
