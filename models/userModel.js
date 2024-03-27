@@ -25,7 +25,7 @@ const User = sequelize.define('User', {
       allowNull: false,
     },
     account_created: {
-      type: DataTypes.DATE,   
+      type: DataTypes.UUID,   
       defaultValue: DataTypes.NOW, 
     },
     account_updated: {
