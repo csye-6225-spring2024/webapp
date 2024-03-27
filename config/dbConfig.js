@@ -8,7 +8,8 @@ const sequelize = new Sequelize({
   username: process.env.DB_USER,
   password: process.env.DB_PASSWORD,
   database: process.env.DB,
-  dialect: process.env.DIALECT
+  dialect: process.env.DIALECT,
+  node_env: process.env.node_env
 });
 
 export default sequelize;
