@@ -60,13 +60,14 @@ const isAlphaString = (str) => {
 };
 
 const verifyUser = async (req, res) => {
+    const { token, username } = req.query;
+
     try {
-        const { token, username } = req.query;
-        console.log("Token:", token);
-        console.log("Username:", username);
+       
+    
         
         // Retrieve the user from the database using the token and username
-        const user = await User.findOne({ where: { token, username } });
+        const user = await User.findOne({ where: { username } });
 
         if (!user) {
             console.log("User not found for token:", token, "and username:", username);
