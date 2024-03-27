@@ -60,11 +60,12 @@ const isAlphaString = (str) => {
 };
 
 const verifyUser = async (req, res) => {
+
     const { token, username } = req.query;
 
     try {
        
-    
+   
         
         // Retrieve the user from the database using the token and username
         const user = await User.findOne({ where: { username } });
