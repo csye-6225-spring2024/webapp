@@ -40,7 +40,7 @@ passwdValidator
 };
 
 const isTesting = process.env.NODE_ENV === 'test';
-const isVerified = isTesting ? true : false;
+const isVerified = isTesting ? true : false;  
 
 // Function to validate if a string contains only letters (no digits)
 const isAlphaString = (str) => {
@@ -79,10 +79,10 @@ const verifyUser = async (req, res) => {
             // Check if the user is already verified
             if (!user.is_verified) {
                 // Update user's verification status to true
-                await user.update({ is_verified: true });
+                await user.update({ is_verified: true }); 
                 return res.status(200).send("Email Verified");
             } else {
-                return res.status(200).send("Already verified");
+                return res.status(200).send("Already verified");   
             }
         } else {
             return res.status(400).send("Link Expired");
