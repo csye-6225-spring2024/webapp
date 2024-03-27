@@ -62,20 +62,29 @@ const isAlphaString = (str) => {
 const verifyUser = async (req, res) => {
     try {
         const { token, username } = req.query;
+        console.log("Token:", token);
+        console.log("Username:", username);
         
         // Retrieve the user from the database using the token and username
         const user = await User.findOne({ where: { token, username } });
 
         if (!user) {
+            console.log("User not found for token:", token, "and username:", username);
             return res.status(400).send("Invalid token or username");
         }
 
+        // Add console log to check the value of is_verified
+        console.log("is_verified:", user.is_verified);
+
         const currentTime = new Date();
         const validityTime = new Date(user.validity);
+        console.log("Current Time:", currentTime);
+        console.log("Validity Time:", validityTime);
 
         if (currentTime < validityTime) {
             // Check if the token sent in the link matches the one in the database
             if (user.token !== token) {
+                console.log("Invalid token:", token);
                 return res.status(400).send("Invalid token");
             }
 
@@ -83,11 +92,14 @@ const verifyUser = async (req, res) => {
             if (!user.is_verified) {
                 // Update user's verification status to true
                 await user.update({ is_verified: true }); 
+                console.log("User verification status updated to true");
                 return res.status(200).send("Email Verified");
             } else {
+                console.log("User is already verified");
                 return res.status(200).send("Already verified");   
             }
         } else {
+            console.log("Link Expired");
             return res.status(400).send("Link Expired");
         }
     } catch (error) {
@@ -95,6 +107,7 @@ const verifyUser = async (req, res) => {
         res.status(500).send("Internal Server Error");
     }
 };
+
 
 
 const pubsub = new PubSub(); 
