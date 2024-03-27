@@ -72,8 +72,13 @@ const verifyUser = async (req, res) => {
 
         const currentTime = new Date();
         const validityTime = new Date(user.validity);
-        console.log(is_verified);
+
         if (currentTime < validityTime) {
+            // Check if the token sent in the link matches the one in the database
+            if (user.token !== token) {
+                return res.status(400).send("Invalid token");
+            }
+
             // Check if the user is already verified
             if (!user.is_verified) {
                 // Update user's verification status to true
@@ -90,7 +95,6 @@ const verifyUser = async (req, res) => {
         res.status(500).send("Internal Server Error");
     }
 };
-
 
 
 const pubsub = new PubSub(); 
