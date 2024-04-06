@@ -1,95 +1,119 @@
 name: Workflow CII
- 
+
 on:
   pull_request:
-    types: [closed]
+    #types: [closed]
     branches:
       - main
- 
+
 jobs:
   build:
     name: test-build
-    if: github.event.pull_request.merged == true
+    #if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
-      
+
     strategy:
       matrix:
         node-version: [20.x]
- 
+
     steps:
- 
+
       - name: Start MySQL
         run: |
           sudo systemctl start mysql
           sudo systemctl status mysql
- 
+
       - name: Configure MySQL
         run: |
-         sudo mysql -u root -p"${{ secrets.MYSQL_ROOT_PASSWORD }}" -e "CREATE DATABASE IF NOT EXISTS ${{ secrets.DB }};"
-         sudo mysql -u root -p"${{ secrets.MYSQL_ROOT_PASSWORD }}" -e "CREATE USER IF NOT EXISTS '${{ secrets.DB_USER }}'@'localhost' IDENTIFIED BY '${{ secrets.DB_PASSWORD }}';"
-         sudo mysql -u root -p"${{ secrets.MYSQL_ROOT_PASSWORD }}" -e "GRANT ALL PRIVILEGES ON ${{ secrets.DB }}.* TO '${{ secrets.DB_USER }}'@'localhost';"
-         sudo mysql -u root -p"${{ secrets.MYSQL_ROOT_PASSWORD }}" -e "FLUSH PRIVILEGES;"
- 
+          sudo mysql -u root -p"${{ secrets.MYSQL_ROOT_PASSWORD }}" -e "CREATE DATABASE IF NOT EXISTS ${{ secrets.DB }};"
+          sudo mysql -u root -p"${{ secrets.MYSQL_ROOT_PASSWORD }}" -e "CREATE USER IF NOT EXISTS '${{ secrets.DB_USER }}'@'localhost' IDENTIFIED BY '${{ secrets.DB_PASSWORD }}';"
+          sudo mysql -u root -p"${{ secrets.MYSQL_ROOT_PASSWORD }}" -e "GRANT ALL PRIVILEGES ON ${{ secrets.DB }}.* TO '${{ secrets.DB_USER }}'@'localhost';"
+          sudo mysql -u root -p"${{ secrets.MYSQL_ROOT_PASSWORD }}" -e "FLUSH PRIVILEGES;"
+
       - uses: actions/checkout@v2
- 
+
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v2
         with:
           node-version: ${{ matrix.node-version }}
-    
+
       - name: Set up environment variables
-        run: |         
+        run: |
           echo "DB_USER=${{ secrets.DB_USER}}" > .env
           echo "DB_PASSWORD=${{ secrets.DB_PASSWORD }}" >> .env
           echo "DB=${{ secrets.DB }}" >> .env
           echo "HOST=${{ secrets.HOST }}" >> .env
           echo "DIALECT=${{ secrets.DIALECT }}" >> .env
           echo "NODE_ENV=${{ secrets.NODE_ENV }}" >> .env
- 
+
       - name: Install Dependencies
         run: npm install
- 
+
       - name: Start the application
         run: |
             npm start &
-        
+
       - name: Wait for the application to be ready
         run: |
             sleep 10
             until curl -s http://localhost:8080; do
               sleep 5
             done
- 
+
       - name: Run Tests
         run: npm test
 
       - name: Remove .env file
         run: rm .env
- 
+
       - id: 'auth'
         uses: 'google-github-actions/auth@v2'
         with:
           credentials_json: '${{ secrets.GCP_SA_KEY }}'
-  
+
       - name: 'Set up Cloud SDK'
         uses: 'google-github-actions/setup-gcloud@v2'
-  
+
       - name: 'Use gcloud CLI'
         run: 'gcloud info'
-        
+
       - name: Create webapp.zip
         run: |
             zip -r webapp.zip ./
- 
-      # - name: Install Packer
-      #   run: |
-      #     curl -fsSL https://releases.hashicorp.com/packer/1.7.5/packer_1.7.5_linux_amd64.zip -o packer.zip
-      #     unzip packer.zip -d /tmp
-      #     sudo mv /tmp/packer /usr/bin/packer
-      #     packer --version
- 
+
       - name: Initialize Packer
         run: packer init packer-config/custom_image.pkr.hcl
- 
+
       - name: Build custom image
         run:  packer build -var 'project_id=${{ secrets.GCP_PROJECT_ID }}'  packer-config/custom_image.pkr.hcl
+
+      - name: Set up environment variables for instance template
+        run: |
+          echo "HOST=${{ secrets.HOST }}" > /opt/webapp/.env
+          echo "DB=${{ secrets.DB }}" >> /opt/webapp/.env
+          echo "DB_USER=${{ secrets.DB_USER }}" >> /opt/webapp/.env
+          echo "DB_PASSWORD=${{ secrets.DB_PASSWORD }}" >> /opt/webapp/.env
+          echo "DIALECT=mysql" >> /opt/webapp/.env
+          echo "LOGPATH=/var/log/webapp/myapp.log" >> /opt/webapp/.env
+          echo "Environment variables written to /opt/webapp/.env"
+
+      - name: Create Instance Template
+        run: |
+          # Extract the image ID from Packer output
+          image_id=$(grep 'image' build.log | awk '{print $NF}')
+          gcloud compute instance-templates create my-template --machine-type n1-standard-1 --image $image_id --region us-central1
+
+      - name: Update Managed Instance Group
+        run: |
+          # Update managed instance group with the new template
+          gloud compute instance-groups managed rolling-action replace my-instance-group --zone us-central1-a --replacement-method=recreate --new-instance-template=my-template
+
+      - name: Recreate Instances
+        run: |
+          # Recreate instances in the managed instance group
+          gcloud compute instance-groups managed recreate-instances my-instance-group --zone us-central1-a
+
+      - name: Wait for Instance Refresh
+        run: |
+          # Wait for instance group refresh to complete
+          gcloud compute instance-groups managed wait-until-stable my-instance-group --zone us-central1-a

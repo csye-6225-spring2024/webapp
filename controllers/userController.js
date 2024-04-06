@@ -152,15 +152,13 @@ const is_verified = isTesting ? true : false;
             }
             
             if (
-                isValidEmail(`${req.body.username}`) ||
-                passwdValidator.validate(`${req.body.password}`)
+                !emailValidator.validate(`${req.body.username}`) ||
+                !passwdValidator.validate(`${req.body.password}`)
             ) {
-                //console.log(req.body.username);
                 res.status(400).send("Invalid email or password format.");
                 logger.error("Invalid email or password format.");
                 return;
             }
-            
             // Validating first_name and last_name format
             if (
                 !isAlphaString(req.body.first_name) ||
