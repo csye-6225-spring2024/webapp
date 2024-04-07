@@ -89,10 +89,10 @@ jobs:
 
       - name: Set up environment variables for instance template
         run: |
-          echo "HOST=${{ secrets.HOST }}" > /opt/webapp/.env
-          echo "DB=${{ secrets.DB }}" >> /opt/webapp/.env
-          echo "DB_USER=${{ secrets.DB_USER }}" >> /opt/webapp/.env
-          echo "DB_PASSWORD=${{ secrets.DB_PASSWORD }}" >> /opt/webapp/.env
+          echo "HOST=${{ secrets.CHOST }}" > /opt/webapp/.env
+          echo "DB=${{ secrets.CDB }}" >> /opt/webapp/.env
+          echo "DB_USER=${{ secrets.CDB_USER }}" >> /opt/webapp/.env
+          echo "DB_PASSWORD=${{ secrets.CDB_PASSWORD }}" >> /opt/webapp/.env
           echo "DIALECT=mysql" >> /opt/webapp/.env
           echo "LOGPATH=/var/log/webapp/myapp.log" >> /opt/webapp/.env
           echo "Environment variables written to /opt/webapp/.env"
@@ -101,7 +101,7 @@ jobs:
         run: |
           # Extract the image ID from Packer output
           image_id=$(grep 'image' build.log | awk '{print $NF}')
-          gcloud compute instance-templates create my-template --machine-type n1-standard-1 --image $image_id --region us-central1
+          gcloud compute instance-templates create my-template --machine-type e2-medium --image $image_id --region us-central1
 
       - name: Update Managed Instance Group
         run: |
