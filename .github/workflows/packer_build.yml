@@ -90,9 +90,9 @@ jobs:
       - name: Create Instance Template
         run: |
           # Extract the image ID from Packer output
-          image_id=$(grep 'image' build.log | awk '{print $NF}')
-          sudo mkdir -p /opt/webapp/
-          sudo chown csye6225:csye6225 /opt/webapp/
+          # image_id=$(grep 'image' build.log | awk '{print $NF}')
+          image_id=$(grep 'custom-image' $GITHUB_WORKSPACE/build.log | awk '{print $NF}')
+          echo "::set-output name=image_id::$image_id"
 
           gcloud compute instance-templates create my-template --machine-type e2-medium --image $image_id --region us-central1
 
