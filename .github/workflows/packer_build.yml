@@ -87,21 +87,30 @@ jobs:
       - name: Build custom image
         run:  packer build -var 'project_id=${{ secrets.GCP_PROJECT_ID }}'  packer-config/custom_image.pkr.hcl
 
-      - name: Set up environment variables for instance template
-        run: |
-          echo "HOST=${{ secrets.CHOST }}" > /opt/webapp/.env
-          echo "DB=${{ secrets.CDB }}" >> /opt/webapp/.env
-          echo "DB_USER=${{ secrets.CDB_USER }}" >> /opt/webapp/.env
-          echo "DB_PASSWORD=${{ secrets.CDB_PASSWORD }}" >> /opt/webapp/.env
-          echo "DIALECT=mysql" >> /opt/webapp/.env
-          echo "LOGPATH=/var/log/webapp/myapp.log" >> /opt/webapp/.env
-          echo "Environment variables written to /opt/webapp/.env"
-
       - name: Create Instance Template
         run: |
           # Extract the image ID from Packer output
           image_id=$(grep 'image' build.log | awk '{print $NF}')
+          sudo mkdir -p /opt/webapp/
+          sudo chown csye6225:csye6225 /opt/webapp/
+
           gcloud compute instance-templates create my-template --machine-type e2-medium --image $image_id --region us-central1
+
+          ENV_FILE=\"/opt/webapp/.env\"
+
+          if [ ! -f \"$ENV_FILE\" ]; then
+            echo \"HOST=${google_compute_address.endpointip.address}\" > /opt/webapp/.env
+            echo \"DB=${google_sql_database.cloudsql_database.name}\" >> /opt/webapp/.env
+            echo \"DB_USER=${google_sql_user.cloudsql_user.name}\" >> /opt/webapp/.env
+            echo \"DB_PASSWORD=${google_sql_user.cloudsql_user.password}\" >> /opt/webapp/.env
+            echo \"DIALECT=mysql\" >> /opt/webapp/.env
+            echo \"LOGPATH=/var/log/webapp/myapp.log\" >> /opt/webapp/.env
+            echo \"Environment variables written to $ENV_FILE\"
+          else
+            echo \"The file $ENV_FILE already exists. Skipping writing environment variables.\"
+          fi
+
+          sudo ./opt/webapp/packer-config/configure_systemd.sh"
 
       - name: Update Managed Instance Group
         run: |
