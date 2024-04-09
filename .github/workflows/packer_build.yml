@@ -91,7 +91,7 @@ jobs:
         run: |
           # Read the manifest.json file and extract the image name
           image_list=$(gcloud compute images list --filter="name~'custom-image-.*'" --format="value(NAME, creationTimestamp)" | sort -k2 -r)
-          latest_key=$(gcloud kms keys list --location=us-central1 --keyring=my-key-ring-* --format="value(NAME)" | sort -r | head -n1)
+          latest_keyring=$(gcloud kms keyrings list --location=us-central1 --format="value(NAME)" | sort -r | head -n1)
 
           echo "$image_list"
           # Extract latest image
@@ -112,8 +112,8 @@ jobs:
             --boot-disk-auto-delete=yes \
             --boot-disk-size=100GB \
             --boot-disk-mode=rw \
-            --boot-disk-encryption-key=projects/tf-gcp-infra-414023/us-central1/your-location/keyRings/your-key-ring/cryptoKeys/your-crypto-key \
-            --boot-disk-kms-key=projects/your-project-id/locations/your-location/keyRings/your-key-ring/cryptoKeys/your-crypto-key \
+            # --boot-disk-encryption-key=projects/tf-gcp-infra-414023/us-central1/your-location/keyRings/your-key-ring/cryptoKeys/your-crypto-key \
+            --boot-disk-kms-key=$latest_key \
             --metadata=startup-script="ENV_FILE=\"/opt/webapp/.env\"
 
           if [ ! -f \"\$ENV_FILE\" ]; then
