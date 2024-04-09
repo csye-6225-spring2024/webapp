@@ -98,7 +98,7 @@ jobs:
           latest_image=$(echo "$image_list" | head -n1 | awk '{print $1}')
 
           echo "Latest Image: $latest_image"
-          echo "Latest Key: $latest_key"
+          echo "Latest Key: $latest_keyring"
 
           gcloud compute instance-templates create webapp-template-$(date +%Y%m%d%H%M%S) \
             --machine-type=e2-medium \
