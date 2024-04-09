@@ -84,8 +84,8 @@ jobs:
       - name: Initialize Packer
         run: packer init packer-config/custom_image.pkr.hcl
 
-      - name: Build custom image
-        run:  packer build -var 'project_id=${{ secrets.GCP_PROJECT_ID }}'  packer-config/custom_image.pkr.hcl
+      # - name: Build custom image
+      #   run:  packer build -var 'project_id=${{ secrets.GCP_PROJECT_ID }}'  packer-config/custom_image.pkr.hcl
 
       - name: Read Manifest JSON
         run: |
@@ -101,14 +101,14 @@ jobs:
             --machine-type=e2-medium \
             --image=$latest_image \
             --network=https://www.googleapis.com/compute/v1/projects/tf-gcp-infra-414023/global/networks/my-vpc \
-            --subnetwork="10.0.1.0/24"\
+            --subnetwork=https://www.googleapis.com/compute/v1/projects/tf-gcp-infra-414023/regions/us-central1/subnetworks/webapp \
             --description="my-template" \
             --metadata=startup-script="ENV_FILE=\"/opt/webapp/.env\"
 
           if [ ! -f \"\$ENV_FILE\" ]; then
               CHOST=\$(echo \$\{{ secrets.CHOST \}})
               CDB_USER=\$(echo \$\{{ secrets.CDB_USER \}})
-              CDB_PASSWORD=\$(echo \$\{{ secrets.CDB_PASSWORD \}})
+              CDB_PASSWORD="G5eAfWLcJXPlbdknjWci"
               CDB=\$(echo \$\{{ secrets.CDB \}})
 
               # Write environment variables to the .env file
