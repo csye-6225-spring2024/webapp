@@ -87,15 +87,12 @@ jobs:
       - name: Build custom image
         run:  packer build -var 'project_id=${{ secrets.GCP_PROJECT_ID }}'  packer-config/custom_image.pkr.hcl
 
-      - name: Create Instance Template
+      - name: Read Manifest JSON
         run: |
-          # Extract the image ID from Packer output
-          image_id=$(grep 'image' $GITHUB_WORKSPACE/build.log | awk '{print $NF}')
-          echo "image_id: $image_id"
-
-          image_id1=$(grep 'custom-image' $GITHUB_WORKSPACE/build.log | awk '{print $NF}')
-          echo "image_id1: $image_id1"
-          echo "::set-output name=image_id::$image_id"
+          # Read the manifest.json file and extract the image name
+          image_name=$(jq -r '.name' manifest.json)
+          echo "Image Name: $image_name"
+          echo "::set-output name=image_name::$image_name"
 
           gcloud compute instance-templates create my-template --machine-type e2-medium --image $image_id --region us-central1
 

@@ -89,4 +89,14 @@ build {
       "sudo systemctl restart google-cloud-ops-agent",
     ]
   }
+  post-processors {
+    manifest {
+      output = "manifest.json"
+      content {
+        name     = "{{ .BuildName }}"
+        image_id = "{{ .ImageID }}"
+      }
+    }
+  }
 }
+
