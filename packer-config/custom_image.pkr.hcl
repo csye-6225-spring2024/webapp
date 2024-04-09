@@ -89,14 +89,24 @@ build {
       "sudo systemctl restart google-cloud-ops-agent",
     ]
   }
-  post-processors {
-    manifest {
-      output = "manifest.json"
-      content {
-        name     = "{{ .BuildName }}"
-        image_id = "{{ .ImageID }}"
+  source "googlecompute" "custom-image" {
+    # Define your source configuration
+  }
+
+  build {
+    sources = ["source.googlecompute.custom-image"]
+
+    # Define your provisioners and other build configurations here
+
+    post-processors {
+      manifest {
+        output = "manifest.json"
+        content {
+          name     = "{{ .BuildName }}"
+          image_id = "{{ .ImageID }}"
+        }
       }
     }
   }
-}
+
 
