@@ -92,13 +92,13 @@ jobs:
           # Read the manifest.json file and extract the image name
           image_list=$(gcloud compute images list --filter="name~'custom-image-.*'" --format="value(NAME, creationTimestamp)" | sort -k2 -r)
           latest_keyring=$(gcloud kms keyrings list --location=us-central1 --format="value(NAME)" | sort -r | head -n1)
+          echo "Latest Key: $latest_keyring"
 
           echo "$image_list"
           # Extract latest image
           latest_image=$(echo "$image_list" | head -n1 | awk '{print $1}')
 
           echo "Latest Image: $latest_image"
-          echo "Latest Key: $latest_keyring"
 
           gcloud compute instance-templates create webapp-template-$(date +%Y%m%d%H%M%S) \
             --machine-type=e2-medium \
