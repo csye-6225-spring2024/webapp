@@ -100,7 +100,7 @@ jobs:
           gcloud compute instance-templates create my-template \
             --machine-type=e2-medium \
             --image=$latest_image \
-            --network=https://www.googleapis.com/compute/v1/projects/tf-gcp-infra-419043/global/networks/my-vpc \
+            --network=https://www.googleapis.com/compute/v1/projects/tf-gcp-infra-414023/global/networks/my-vpc \
             --subnetwork="10.0.1.0/24"\
             --description="my-template" \
             --metadata=startup-script="ENV_FILE=\"/opt/webapp/.env\"
@@ -124,7 +124,7 @@ jobs:
           fi
 
           sudo ./opt/webapp/packer-config/configure_systemd.sh\"" \
-            --service-account=monitoring-service-account@tf-gcp-infra-419043.iam.gserviceaccount.com \
+            --service-account=monitoring-service-account@tf-gcp-infra-414023.iam.gserviceaccount.com \
             --scopes="cloud-platform" \
             --format=json
 
