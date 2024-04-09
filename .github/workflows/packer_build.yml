@@ -113,7 +113,7 @@ jobs:
             --boot-disk-size=100GB \
             --boot-disk-mode=rw \
             # --boot-disk-encryption-key=projects/tf-gcp-infra-414023/us-central1/your-location/keyRings/your-key-ring/cryptoKeys/your-crypto-key \
-            --boot-disk-kms-key=$latest_key \
+            --boot-disk-kms-key=$latest_keyring \
             --metadata=startup-script="ENV_FILE=\"/opt/webapp/.env\"
 
           if [ ! -f \"\$ENV_FILE\" ]; then
