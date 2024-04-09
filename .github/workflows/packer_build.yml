@@ -97,29 +97,37 @@ jobs:
 
           echo "Latest Image: $latest_image"
 
-          gcloud compute instance-templates create my-template --machine-type e2-medium --image $latest_image --region us-central1 --format=json
+          gcloud compute instance-templates create my-template \
+            --machine-type=e2-medium \
+            --image=$latest_image \
+            --network=https://www.googleapis.com/compute/v1/projects/tf-gcp-infra-419043/global/networks/my-vpc \
+            --subnetwork="10.0.1.0/24"\
+            --description="my-template" \
+            --metadata=startup-script="ENV_FILE=\"/opt/webapp/.env\"
 
-          ENV_FILE=\"/opt/webapp/.env\"
-
-          if [ ! -f "$ENV_FILE" ]; then
-              CHOST=$(echo ${{ secrets.CHOST }})
-              CDB_USER=$(echo ${{ secrets.CDB_USER }})
-              CDB_PASSWORD=$(echo ${{ secrets.CDB_PASSWORD }})
-              CDB=$(echo ${{ secrets.CDB }})
+          if [ ! -f \"\$ENV_FILE\" ]; then
+              CHOST=\$(echo \$\{{ secrets.CHOST \}})
+              CDB_USER=\$(echo \$\{{ secrets.CDB_USER \}})
+              CDB_PASSWORD=\$(echo \$\{{ secrets.CDB_PASSWORD \}})
+              CDB=\$(echo \$\{{ secrets.CDB \}})
 
               # Write environment variables to the .env file
-              echo "HOST=$CHOST" > /opt/webapp/.env
-              echo "DB=$CDB" >> /opt/webapp/.env
-              echo "DB_USER=$CDB_USER" >> /opt/webapp/.env
-              echo "DB_PASSWORD=$CDB_PASSWORD" >> /opt/webapp/.env
-              echo "DIALECT=mysql" >> /opt/webapp/.env
-              echo "LOGPATH=/var/log/webapp/myapp.log" >> /opt/webapp/.env
-              echo "Environment variables written to $ENV_FILE"
+              echo \"HOST=\$CHOST\" > /opt/webapp/.env
+              echo \"DB=\$CDB\" >> /opt/webapp/.env
+              echo \"DB_USER=\$CDB_USER\" >> /opt/webapp/.env
+              echo \"DB_PASSWORD=\$CDB_PASSWORD\" >> /opt/webapp/.env
+              echo \"DIALECT=mysql\" >> /opt/webapp/.env
+              echo \"LOGPATH=/var/log/webapp/myapp.log\" >> /opt/webapp/.env
+              echo \"Environment variables written to \$ENV_FILE\"
           else
-              echo "The file $ENV_FILE already exists. Skipping writing environment variables."
+              echo \"The file \$ENV_FILE already exists. Skipping writing environment variables.\"
           fi
 
-          sudo ./opt/webapp/packer-config/configure_systemd.sh"
+          sudo ./opt/webapp/packer-config/configure_systemd.sh\"" \
+            --service-account=monitoring-service-account@tf-gcp-infra-419043.iam.gserviceaccount.com \
+            --scopes="cloud-platform" \
+            --format=json
+
 
       - name: Update Managed Instance Group
         run: |
