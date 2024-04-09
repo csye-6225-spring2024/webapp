@@ -97,12 +97,11 @@ jobs:
 
           echo "Latest Image: $latest_image"
 
-          gcloud compute instance-templates create my-template --machine-type e2-medium --image $latest_image --region us-central1
+          gcloud compute instance-templates create my-template --machine-type e2-medium --image $latest_image --region us-central1 --format=json
 
           ENV_FILE=\"/opt/webapp/.env\"
 
           if [ ! -f "$ENV_FILE" ]; then
-              # Fetch the values of CHOST, CDB_USER, CDB_PASSWORD, and CDB secrets
               CHOST=$(echo ${{ secrets.CHOST }})
               CDB_USER=$(echo ${{ secrets.CDB_USER }})
               CDB_PASSWORD=$(echo ${{ secrets.CDB_PASSWORD }})
