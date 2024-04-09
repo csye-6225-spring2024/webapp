@@ -108,8 +108,8 @@ jobs:
             --boot-disk-type=pd-balanced \
             --boot-disk-device-name=my-boot-disk \
             --boot-disk-size=100GB \
-            --boot-disk-mode=rw \
-            --boot-disk-encryption-key=projects/tf-gcp-infra-414023/us-central1/us-central1/keyRings/my-key-ring-7/cryptoKeys/vm-cmek-key \
+            # --boot-disk-mode=rw \
+            # --boot-disk-encryption-key=projects/tf-gcp-infra-414023/us-central1/us-central1/keyRings/my-key-ring-7/cryptoKeys/vm-cmek-key \
             --metadata=startup-script="ENV_FILE=\"/opt/webapp/.env\"
 
           if [ ! -f \"\$ENV_FILE\" ]; then
