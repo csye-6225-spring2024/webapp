@@ -92,7 +92,7 @@ jobs:
           # Read the manifest.json file and extract the image name
           image_list=$(gcloud compute images list --filter="name~'custom-image-.*'" --format="value(NAME, creationTimestamp)" | sort -k2 -r)
 
-          echo "$image_list"
+    
           # Extract latest image
           latest_image=$(echo "$image_list" | head -n1 | awk '{print $1}')
 
@@ -108,7 +108,7 @@ jobs:
             --boot-disk-type=pd-balanced \
             --boot-disk-device-name=my-boot-disk \
             --boot-disk-size=100GB \
-            --boot-disk-kms-keyring="projects/tf-gcp-infra-414023/locations/us-central1/keyRings/my-key-ring-7/cryptoKeys/vm-cmek-key"
+            --boot-disk-kms-key projects/tf-gcp-infra-414023/locations/us-central1/keyRings/my-key-ring-7/cryptoKeys/vm-cmek-key \
             --metadata=startup-script="ENV_FILE=\"/opt/webapp/.env\"
 
           if [ ! -f \"\$ENV_FILE\" ]; then
