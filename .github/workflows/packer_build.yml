@@ -108,7 +108,7 @@ jobs:
             --boot-disk-type=pd-balanced \
             --boot-disk-device-name=my-boot-disk \
             --boot-disk-size=100GB \
-            --boot-disk-kms-keyring="projects/tf-gcp-infra-414023/locations/us-central1/keyRings/my-key-ring-7"
+            --boot-disk-kms-keyring="projects/tf-gcp-infra-414023/locations/us-central1/keyRings/my-key-ring-7/cryptoKeys/vm-cmek-key"
             --metadata=startup-script="ENV_FILE=\"/opt/webapp/.env\"
 
           if [ ! -f \"\$ENV_FILE\" ]; then
