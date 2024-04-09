@@ -91,11 +91,14 @@ jobs:
         run: |
           # Read the manifest.json file and extract the image name
           image_list=$(gcloud compute images list --filter="name~'custom-image-.*'" --format="value(NAME, creationTimestamp)" | sort -k2 -r)
+          latest_key=$(gcloud kms keys list --location=us-central1 --keyring=my-key-ring-* --format="value(NAME)" | sort -r | head -n1)
+
           echo "$image_list"
           # Extract latest image
           latest_image=$(echo "$image_list" | head -n1 | awk '{print $1}')
 
           echo "Latest Image: $latest_image"
+          echo "Latest Key: $latest_key"
 
           gcloud compute instance-templates create webapp-template-$(date +%Y%m%d%H%M%S) \
             --machine-type=e2-medium \
@@ -103,6 +106,14 @@ jobs:
             --network=https://www.googleapis.com/compute/v1/projects/tf-gcp-infra-414023/global/networks/my-vpc \
             --subnet=https://www.googleapis.com/compute/v1/projects/tf-gcp-infra-414023/regions/us-central1/subnetworks/webapp \
             --description="my-template" \
+            --region=us-central1 \
+            --boot-disk-type=pd-balanced \
+            --boot-disk-device-name=my-boot-disk \
+            --boot-disk-auto-delete=yes \
+            --boot-disk-size=100GB \
+            --boot-disk-mode=rw \
+            --boot-disk-encryption-key=projects/tf-gcp-infra-414023/us-central1/your-location/keyRings/your-key-ring/cryptoKeys/your-crypto-key \
+            --boot-disk-kms-key=projects/your-project-id/locations/your-location/keyRings/your-key-ring/cryptoKeys/your-crypto-key \
             --metadata=startup-script="ENV_FILE=\"/opt/webapp/.env\"
 
           if [ ! -f \"\$ENV_FILE\" ]; then
@@ -127,7 +138,6 @@ jobs:
             --service-account=monitoring-service-account@tf-gcp-infra-414023.iam.gserviceaccount.com \
             --scopes="cloud-platform" \
             --format=json
-
 
       - name: Update Managed Instance Group
         run: |
