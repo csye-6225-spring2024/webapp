@@ -108,7 +108,7 @@ jobs:
             --boot-disk-type=pd-balanced \
             --boot-disk-device-name=my-boot-disk \
             --boot-disk-size=100GB \
-            --boot-disk-encryption-key=projects/tf-gcp-infra-414023/locations/us-central1/keyRings/my-key-ring-7/cryptoKeys/vm-cmek-key \
+            #--boot-disk-encryption-key=projects/tf-gcp-infra-414023/locations/us-central1/keyRings/my-key-ring-7/cryptoKeys/vm-cmek-key \
             --metadata=startup-script="ENV_FILE=\"/opt/webapp/.env\"
 
           if [ ! -f \"\$ENV_FILE\" ]; then
@@ -132,7 +132,7 @@ jobs:
           sudo ./opt/webapp/packer-config/configure_systemd.sh\"" \
             --service-account=monitoring-service-account@tf-gcp-infra-414023.iam.gserviceaccount.com \
             --scopes="cloud-platform" \
-            --boot-disk-interface=SCSI \
+            # --boot-disk-interface=SCSI \
             --format=json
 
       - name: Update Managed Instance Group
