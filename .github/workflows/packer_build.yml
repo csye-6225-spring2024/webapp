@@ -101,7 +101,7 @@ jobs:
           gcloud compute instance-templates create webapp-template-$(date +%Y%m%d%H%M%S) \
             --machine-type=e2-medium \
             --image=$latest_image \
-            --network=https://www.googleapis.com/compute/v1/projects/tf-gcp-infra-414023/global/networks/my-vpc \
+            --network=https://www.googleapis.com/compute/v1/projects/tf-gcp-infra-414023/us-central1/networks/my-vpc \
             --subnet=https://www.googleapis.com/compute/v1/projects/tf-gcp-infra-414023/regions/us-central1/subnetworks/webapp \
             --description="my-template" \
             --region=us-central1 \
