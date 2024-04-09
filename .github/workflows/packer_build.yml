@@ -101,7 +101,7 @@ jobs:
             --machine-type=e2-medium \
             --image=$latest_image \
             --network=https://www.googleapis.com/compute/v1/projects/tf-gcp-infra-414023/global/networks/my-vpc \
-            --subnetwork=https://www.googleapis.com/compute/v1/projects/tf-gcp-infra-414023/regions/us-central1/subnetworks/webapp \
+            --subnet=https://www.googleapis.com/compute/v1/projects/tf-gcp-infra-414023/regions/us-central1/subnetworks/webapp \
             --description="my-template" \
             --metadata=startup-script="ENV_FILE=\"/opt/webapp/.env\"
 
