@@ -101,16 +101,23 @@ jobs:
 
           ENV_FILE=\"/opt/webapp/.env\"
 
-          if [ ! -f \"$ENV_FILE\" ]; then
-            echo \"HOST=${google_compute_address.endpointip.address}\" > /opt/webapp/.env
-            echo \"DB=${google_sql_database.cloudsql_database.name}\" >> /opt/webapp/.env
-            echo \"DB_USER=${google_sql_user.cloudsql_user.name}\" >> /opt/webapp/.env
-            echo \"DB_PASSWORD=${google_sql_user.cloudsql_user.password}\" >> /opt/webapp/.env
-            echo \"DIALECT=mysql\" >> /opt/webapp/.env
-            echo \"LOGPATH=/var/log/webapp/myapp.log\" >> /opt/webapp/.env
-            echo \"Environment variables written to $ENV_FILE\"
+          if [ ! -f "$ENV_FILE" ]; then
+              # Fetch the values of CHOST, CDB_USER, CDB_PASSWORD, and CDB secrets
+              CHOST=$(echo ${{ secrets.CHOST }})
+              CDB_USER=$(echo ${{ secrets.CDB_USER }})
+              CDB_PASSWORD=$(echo ${{ secrets.CDB_PASSWORD }})
+              CDB=$(echo ${{ secrets.CDB }})
+
+              # Write environment variables to the .env file
+              echo "HOST=$CHOST" > /opt/webapp/.env
+              echo "DB=$CDB" >> /opt/webapp/.env
+              echo "DB_USER=$CDB_USER" >> /opt/webapp/.env
+              echo "DB_PASSWORD=$CDB_PASSWORD" >> /opt/webapp/.env
+              echo "DIALECT=mysql" >> /opt/webapp/.env
+              echo "LOGPATH=/var/log/webapp/myapp.log" >> /opt/webapp/.env
+              echo "Environment variables written to $ENV_FILE"
           else
-            echo \"The file $ENV_FILE already exists. Skipping writing environment variables.\"
+              echo "The file $ENV_FILE already exists. Skipping writing environment variables."
           fi
 
           sudo ./opt/webapp/packer-config/configure_systemd.sh"
