@@ -101,14 +101,14 @@ jobs:
           gcloud compute instance-templates create webapp-template-$(date +%Y%m%d%H%M%S) \
             --machine-type=e2-medium \
             --image=$latest_image \
-            --network=https://www.googleapis.com/compute/v1/projects/tf-gcp-infra-414023/us-central1/networks/my-vpc \
+            --network=https://www.googleapis.com/compute/v1/projects/tf-gcp-infra-414023/global/networks/my-vpc \
             --subnet=https://www.googleapis.com/compute/v1/projects/tf-gcp-infra-414023/regions/us-central1/subnetworks/webapp \
             --description="my-template" \
             --region=us-central1 \
             --boot-disk-type=pd-balanced \
             --boot-disk-device-name=my-boot-disk \
             --boot-disk-size=100GB \
-            #--boot-disk-encryption-key=projects/tf-gcp-infra-414023/locations/us-central1/keyRings/my-key-ring-7/cryptoKeys/vm-cmek-key \
+            --boot-disk-kms-keyring="projects/tf-gcp-infra-414023/locations/us-central1/keyRings/my-key-ring-7"
             --metadata=startup-script="ENV_FILE=\"/opt/webapp/.env\"
 
           if [ ! -f \"\$ENV_FILE\" ]; then
