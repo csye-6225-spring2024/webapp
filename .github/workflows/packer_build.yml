@@ -113,9 +113,14 @@ jobs:
 
           if [ ! -f \"\$ENV_FILE\" ]; then
               CHOST=\$(echo \$\{{ secrets.CHOST \}})
+              echo $CHOST
               CDB_USER=\$(echo \$\{{ secrets.CDB_USER \}})
+              echo $CDB_USER
               CDB_PASSWORD="G5eAfWLcJXPlbdknjWci"
+              echo $CDB_PASSWORD
               CDB=\$(echo \$\{{ secrets.CDB \}})
+              echo $CDB
+
 
               # Write environment variables to the .env file
               echo \"HOST=\$CHOST\" > /opt/webapp/.env
