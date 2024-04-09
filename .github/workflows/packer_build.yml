@@ -107,7 +107,6 @@ jobs:
             --region=us-central1 \
             --boot-disk-type=pd-balanced \
             --boot-disk-device-name=my-boot-disk \
-            --boot-disk-auto-delete=yes \
             --boot-disk-size=100GB \
             --boot-disk-mode=rw \
             --boot-disk-encryption-key=projects/tf-gcp-infra-414023/us-central1/us-central1/keyRings/my-key-ring-7/cryptoKeys/vm-cmek-key \
