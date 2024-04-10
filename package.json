@@ -1,6 +1,6 @@
 {
   "type": "module",
-  "name": "Cloud_Assignment",
+  "name": "cloud_assignment",
   "version": "1.0.0",
   "main": "server.js",
   "scripts": {
@@ -27,5 +27,8 @@
     "supertest": "^6.3.4",
     "winston": "^3.12.0"
   },
-  "description": ""
+  "description": "•   Programming Language: Node.js •   Relational Database: MySQL •   Backend Framework: Express.js •   ORM Framework: Sequelize",
+  "directories": {
+    "test": "test"
+  }
 }
