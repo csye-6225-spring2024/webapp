@@ -99,15 +99,7 @@ jobs:
 
       - name: Create Instance Template
         run: |
-          # Read the manifest.json file and extract the image name
-          image_list=$(gcloud compute images list --filter="name~'custom-image-.*'" --format="value(NAME, creationTimestamp)" | sort -k2 -r)
-
-    
-          # Extract latest image
-          latest_image=$(echo "$image_list" | head -n1 | awk '{print $1}')
-
-          echo "Latest Image: $latest_image"
-
+          # Fetching template value
            TEMPLATE=$TEMPLATE
            echo $TEMPLATE
 
@@ -138,8 +130,6 @@ jobs:
             --tags=webapp \
             --service-account=${{ secrets.SERVICE_ACCOUNT }}@${{ secrets.GCP_PROJECT_ID }}.iam.gserviceaccount.com \
             --scopes=${{ secrets.SCOPES  }}
-
-      
 
       - name: Start Rolling Update
         run: |
