@@ -84,8 +84,13 @@ jobs:
       - name: Initialize Packer
         run: packer init packer-config/custom_image.pkr.hcl
 
-      - name: Build custom image
-        run:  packer build -var 'project_id=${{ secrets.GCP_PROJECT_ID }}'  packer-config/custom_image.pkr.hcl
+      # - name: Build custom image
+      #   run:  packer build -var 'project_id=${{ secrets.GCP_PROJECT_ID }}'  packer-config/custom_image.pkr.hcl
+
+
+      - name: Set Template Environment Variable
+        id: set_template
+        run: echo "TEMPLATE=webapp-template-$(date +%Y%m%d%H%M%S)" >> $GITHUB_ENV
 
       - name: Create Instance Template
         run: |
@@ -98,7 +103,7 @@ jobs:
 
           echo "Latest Image: $latest_image"
 
-          TEMPLATE="webapp-template-$(date +%Y%m%d%H%M%S)"
+           TEMPLATE=$TEMPLATE
 
           gcloud compute instance-templates create $TEMPLATE \
             --machine-type=${{ secrets.MACHINE_TYPE }}\
@@ -133,6 +138,7 @@ jobs:
 
       - name: Start Rolling Update
         run: |
+          TEMPLATE=$TEMPLATE
           gcloud compute instance-groups managed rolling-action start-update ${{ secrets.INSTANCE_TEMPLATE }} \
             --version=template=projects/${{ secrets.GCP_PROJECT_ID }}/regions/${{ secrets.REGION }}/instanceTemplates/$TEMPLATE \
             --region=${{ secrets.REGION }} \
