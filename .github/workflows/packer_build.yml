@@ -87,7 +87,7 @@ jobs:
       - name: Build custom image
         run:  packer build -var 'project_id=${{ secrets.GCP_PROJECT_ID }}'  packer-config/custom_image.pkr.hcl
 
-      - name: Read Manifest JSON
+      - name: Create Instance Template
         run: |
           # Read the manifest.json file and extract the image name
           image_list=$(gcloud compute images list --filter="name~'custom-image-.*'" --format="value(NAME, creationTimestamp)" | sort -k2 -r)
@@ -101,23 +101,23 @@ jobs:
           TEMPLATE="webapp-template-$(date +%Y%m%d%H%M%S)"
 
           gcloud compute instance-templates create $TEMPLATE \
-            --machine-type={{ secrets.MACHINE_TYPE }}\
+            --machine-type=${{ secrets.MACHINE_TYPE }}\
             --image=$latest_image \
-            --network=https://www.googleapis.com/compute/v1/projects/{{ secrets.GCP_PROJECT_ID }}/global/networks/${{ secrets.VPC_NAME }}  \
-            --subnet=https://www.googleapis.com/compute/v1/projects/{{ secrets.GCP_PROJECT_ID }}/regions/{{ secrets.REGION }}/subnetworks/${{ secrets.SUBNET_NAME}} \
+            --network=https://www.googleapis.com/compute/v1/projects/${{ secrets.GCP_PROJECT_ID }}/global/networks/${{ secrets.VPC_NAME }}  \
+            --subnet=https://www.googleapis.com/compute/v1/projects/${{ secrets.GCP_PROJECT_ID }}/regions/${{ secrets.REGION }}/subnetworks/${{ secrets.SUBNET_NAME}} \
             --description="my-template" \
-            --instance-template-region={{ secrets.REGION }} \
+            --instance-template-region=${{ secrets.REGION }} \
             --boot-disk-type=${{ secrets.BOOT_DISK_TYPE }}  \
             --boot-disk-device-name=my-boot-disk \
             --boot-disk-size=${{ secrets.BOOT_DISK_SIZE }}  \
-            --boot-disk-kms-key projects/{{ secrets.GCP_PROJECT_ID }}/locations/{{ secrets.REGION }}/keyRings/${{ secrets.KEY_RING }}/cryptoKeys/${{ secrets.KEY}}\
+            --boot-disk-kms-key projects/${{ secrets.GCP_PROJECT_ID }}/locations/${{ secrets.REGION }}/keyRings/${{ secrets.KEY_RING }}/cryptoKeys/${{ secrets.KEY}}\
             --metadata=startup-script='#!/bin/bash
                     ENV_FILE="/opt/webapp/.env"
                     if [ ! -f "$ENV_FILE" ]; then
-                      echo "HOST={{ secrets.CHOST }}" > /opt/webapp/.env
+                      echo "HOST=${{ secrets.CHOST }}" > /opt/webapp/.env
                       echo "DB_PASSWORD=xXhhnwQbZ6j6Tr5E" >> /opt/webapp/.env
-                      echo "DB_USER={{ secrets.CDB_USER }}" >> /opt/webapp/.env
-                      echo "DB={ secrets.CDB  }}" >> /opt/webapp/.env
+                      echo "DB_USER=${{ secrets.CDB_USER }}" >> /opt/webapp/.env
+                      echo "DB=${{ secrets.CDB  }}" >> /opt/webapp/.env
                       echo "DIALECT=mysql" >> /opt/webapp/.env
                       echo "TOPIC_NAME=verify_email" >> /opt/webapp/.env
                       echo "LOGPATH=/var/log/webapp/app.log" >> /opt/webapp/.env
@@ -126,19 +126,19 @@ jobs:
                     fi
                     /opt/webapp/packer-config/configure_systemd.sh' \
             --tags=webapp \
-            --service-account={{ secrets.SERVICE_ACCOUNT }}@{{ secrets.GCP_PROJECT_ID }}.iam.gserviceaccount.com \
+            --service-account=${{ secrets.SERVICE_ACCOUNT }}@${{ secrets.GCP_PROJECT_ID }}.iam.gserviceaccount.com \
             --scopes="cloud-platform"
 
       
 
       - name: Start Rolling Update
         run: |
-          gcloud compute instance-groups managed rolling-action start-update {{ secrets.INSTANCE_TEMPLATE }} \
-            --version=template=projects/{{ secrets.GCP_PROJECT_ID }}/regions/{{ secrets.REGION }}/instanceTemplates/$TEMPLATE \
-            --region={{ secrets.REGION }} \
+          gcloud compute instance-groups managed rolling-action start-update ${{ secrets.INSTANCE_TEMPLATE }} \
+            --version=template=projects/${{ secrets.GCP_PROJECT_ID }}/regions/${{ secrets.REGION }}/instanceTemplates/$TEMPLATE \
+            --region=${{ secrets.REGION }} \
             --type=proactive
 
       - name: Wait for Instance Refresh
         run: |
           # Wait for instance group refresh to complete
-          gcloud compute instance-groups managed wait-until-stable {{secrets.INSTANCE_TEMPLATE }} --region={{ secrets.REGION }}
+          gcloud compute instance-groups managed wait-until-stable ${{secrets.INSTANCE_TEMPLATE }} --region=${{ secrets.REGION }}
