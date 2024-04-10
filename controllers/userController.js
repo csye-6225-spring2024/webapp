@@ -115,6 +115,11 @@ const verifyUser = async (req, res) => {
 const pubsub = new PubSub(); 
 const topicName = 'verify_email';
 
+function isValidEmail(email) {
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    return emailRegex.test(email);
+}
+
 
 const addUser = async (req, res) => {
     logger.debug('Processing user addition...'); 
@@ -145,7 +150,15 @@ const is_verified = isTesting ? true : false;
                 logger.warn("Additional fields are not allowed.");
                 return;
             }
-
+            
+            if (
+                !emailValidator.validate(`${req.body.username}`) ||
+                !passwdValidator.validate(`${req.body.password}`)
+            ) {
+                res.status(400).send("Invalid email or password format.");
+                logger.error("Invalid email or password format.");
+                return;
+            }
             // Validating first_name and last_name format
             if (
                 !isAlphaString(req.body.first_name) ||
@@ -165,15 +178,7 @@ const is_verified = isTesting ? true : false;
                     password: hashPassword, 
                     is_verified: is_verified
                 };
-
-                if (
-                    !emailValidator.validate(`${req.body.username}`) ||
-                    !passwdValidator.validate(`${req.body.password}`)
-                ) {
-                    res.status(400).send("Invalid email or password format.");
-                    logger.error("Invalid email or password format.");
-                    return;
-                }
+                    
 
                 if (req.headers.authorization) {
                     res.status(403).send("Authorization is not supported for this method.");
@@ -255,7 +260,6 @@ const isDBConnected = await dbConnectionCheck();
             logger.error("DB Connection error");
             return;
         }
-
 // Check if the authorization header is undefined
 if (req.headers.authorization === undefined) {
     res.status(403).send("Authorization header is missing.");

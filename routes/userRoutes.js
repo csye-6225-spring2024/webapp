@@ -8,15 +8,17 @@ const router = Router();
 router.route('/')
    .post(addUser)
   .all((req, res) => {
-    res.status(405).send(); // Return 405 for any other method
+    res.status(405).send(); 
   });
 
 router.route('/self')
   .get(getUser)
   .put(updateUser)
   .all((req, res) => {
-    res.status(405).send(); // Return 405 for any other method
+    res.status(405).send(); 
   });
+
+
 
 export default router; 
 
