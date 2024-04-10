@@ -6,7 +6,7 @@ on:
     branches:
       - main
 
-jobs:
+jobs:  
   build:
     name: test-build
     #if: github.event.pull_request.merged == true
