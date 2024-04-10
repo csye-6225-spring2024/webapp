@@ -87,6 +87,11 @@ jobs:
       - name: Build custom image
         run:  packer build -var 'project_id=${{ secrets.GCP_PROJECT_ID }}'  packer-config/custom_image.pkr.hcl
 
+      - name: Extract Image ID from manifest
+        run: |
+          IMAGE_ID=$(jq -r '.builds[-1].artifact_id' manifest.json)
+          echo "Image ID: $IMAGE_ID"
+          echo "IMAGE_ID=${IMAGE_ID}" >> $GITHUB_ENV
 
       - name: Set Template Environment Variable
         id: set_template
@@ -108,7 +113,7 @@ jobs:
 
           gcloud compute instance-templates create $TEMPLATE \
             --machine-type=${{ secrets.MACHINE_TYPE }}\
-            --image=$latest_image \
+            --image=$IMAGE_ID \
             --network=https://www.googleapis.com/compute/v1/projects/${{ secrets.GCP_PROJECT_ID }}/global/networks/${{ secrets.VPC_NAME }}  \
             --subnet=https://www.googleapis.com/compute/v1/projects/${{ secrets.GCP_PROJECT_ID }}/regions/${{ secrets.REGION }}/subnetworks/${{ secrets.SUBNET_NAME}} \
             --description="my-template" \
