@@ -118,15 +118,14 @@ jobs:
               echo $CDB_USER
               CDB_PASSWORD="G5eAfWLcJXPlbdknjWci"
               echo $CDB_PASSWORD
-              CDB=\$(echo \$\{{ secrets.CDB \}})
               echo $CDB
 
 
               # Write environment variables to the .env file
-              echo \"HOST=\$CHOST\" > /opt/webapp/.env
-              echo \"DB=\$CDB\" >> /opt/webapp/.env
-              echo \"DB_USER=\$CDB_USER\" >> /opt/webapp/.env
-              echo \"DB_PASSWORD=\$CDB_PASSWORD\" >> /opt/webapp/.env
+              echo \"HOST=\10.0.2.3\" > /opt/webapp/.env
+              echo \"DB=\webapp\" >> /opt/webapp/.env
+              echo \"DB_USER=\webapp\" >> /opt/webapp/.env
+              echo \"DB_PASSWORD=\IzCMftmfz66gFgkGJHKa\" >> /opt/webapp/.env
               echo \"DIALECT=mysql\" >> /opt/webapp/.env
               echo \"LOGPATH=/var/log/webapp/myapp.log\" >> /opt/webapp/.env
               echo \"Environment variables written to \$ENV_FILE\"
