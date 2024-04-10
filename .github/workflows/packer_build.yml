@@ -98,7 +98,7 @@ jobs:
 
           echo "Latest Image: $latest_image"
 
-          $TEMPLATE = webapp-template-$(date +%Y%m%d%H%M%S)
+          TEMPLATE="webapp-template-$(date +%Y%m%d%H%M%S)"
 
           gcloud compute instance-templates create $TEMPLATE \
             --machine-type=e2-medium \
