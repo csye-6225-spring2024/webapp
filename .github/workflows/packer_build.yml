@@ -120,7 +120,7 @@ jobs:
                     ENV_FILE="/opt/webapp/.env"
                     if [ ! -f "$ENV_FILE" ]; then
                       echo "HOST=${{ secrets.CHOST }}" > /opt/webapp/.env
-                      echo "DB_PASSWORD=xXhhnwQbZ6j6Tr5E" >> /opt/webapp/.env
+                      echo "DB_PASSWORD=${{ secrets.CDB_PASSWORD }}" >> /opt/webapp/.env
                       echo "DB_USER=${{ secrets.CDB_USER }}" >> /opt/webapp/.env
                       echo "DB=${{ secrets.CDB  }}" >> /opt/webapp/.env
                       echo "DIALECT=mysql" >> /opt/webapp/.env
