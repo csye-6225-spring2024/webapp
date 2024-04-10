@@ -109,31 +109,26 @@ jobs:
             --boot-disk-device-name=my-boot-disk \
             --boot-disk-size=${{ secrets.BOOT_DISK_SIZE }} \
             --boot-disk-kms-key projects/${{ secrets.GCP_PROJECT_ID }}/locations/${{ secrets.REGION }}/keyRings/${{ secrets.KEY_RING }}/cryptoKeys/${{ secrets.KEY}} \
-            --metadata=startup-script="ENV_FILE=\"/opt/webapp/.env\"
+            --metadata=startup-script="
 
-          if [ ! -f \"\$ENV_FILE\" ]; then
-              CHOST=\$(echo \$\{{ secrets.CHOST \}})
-              echo $CHOST
-              CDB_USER=\$(echo \$\{{ secrets.CDB_USER \}})
-              echo $CDB_USER
-              CDB_PASSWORD="G5eAfWLcJXPlbdknjWci"
-              echo $CDB_PASSWORD
-              echo $CDB
+                  #!/bin/bash
+                  ENV_FILE="/opt/webapp/.env"
 
+                  if [ ! -f "$ENV_FILE" ]; then
+                    echo "HOST=10.0.2.3" > /opt/webapp/.env
+                    echo "DB=webapp" >> /opt/webapp/.env
+                    echo "DB_USER=webapp" >> /opt/webapp/.env
+                    echo "DB_PASSWORD=IzCMftmfz66gFgkGJHKa" >> /opt/webapp/.env
+                    echo "DIALECT=mysql" >> /opt/webapp/.env
+                    echo "LOGPATH=/var/log/webapp/myapp.log" >> /opt/webapp/.env
+                    echo "Environment variables written to $ENV_FILE"
+                  else
+                    echo "The file $ENV_FILE already exists. Skipping writing environment variables."
+                  fi
 
-              # Write environment variables to the .env file
-              echo \"HOST=\10.0.2.3\" > /opt/webapp/.env
-              echo \"DB=\webapp\" >> /opt/webapp/.env
-              echo \"DB_USER=\webapp\" >> /opt/webapp/.env
-              echo \"DB_PASSWORD=\IzCMftmfz66gFgkGJHKa\" >> /opt/webapp/.env
-              echo \"DIALECT=mysql\" >> /opt/webapp/.env
-              echo \"LOGPATH=/var/log/webapp/myapp.log\" >> /opt/webapp/.env
-              echo \"Environment variables written to \$ENV_FILE\"
-          else
-              echo \"The file \$ENV_FILE already exists. Skipping writing environment variables.\"
-          fi
+                  sudo ./opt/webapp/packer-config/configure_systemd.sh"
 
-          sudo ./opt/webapp/packer-config/configure_systemd.sh\"" \
+        
             --service-account=monitoring-service-account@tf-gcp-infra-414023.iam.gserviceaccount.com \
             --scopes="cloud-platform" \
             # --boot-disk-interface=SCSI \
