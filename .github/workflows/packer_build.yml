@@ -138,7 +138,7 @@ jobs:
             --service-account=monitoring-service-account@tf-gcp-infra-414023.iam.gserviceaccount.com \
             --scopes="cloud-platform" \
             # --boot-disk-interface=SCSI \
-            --format=json
+            # --format=json
 
       - name: Update Managed Instance Group
         run: |
