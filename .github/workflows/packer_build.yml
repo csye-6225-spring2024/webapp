@@ -60,8 +60,8 @@ jobs:
               sleep 5
             done
 
-      # - name: Run Tests
-      #   run: npm test
+      - name: Run Tests
+        run: npm test
 
       - name: Remove .env file
         run: rm .env
@@ -84,8 +84,8 @@ jobs:
       - name: Initialize Packer
         run: packer init packer-config/custom_image.pkr.hcl
 
-      # - name: Build custom image
-      #   run:  packer build -var 'project_id=${{ secrets.GCP_PROJECT_ID }}'  packer-config/custom_image.pkr.hcl
+      - name: Build custom image
+        run:  packer build -var 'project_id=${{ secrets.GCP_PROJECT_ID }}'  packer-config/custom_image.pkr.hcl
 
 
       - name: Set Template Environment Variable
