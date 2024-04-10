@@ -101,14 +101,14 @@ jobs:
           gcloud compute instance-templates create webapp-template-$(date +%Y%m%d%H%M%S) \
             --machine-type=e2-medium \
             --image=$latest_image \
-            --network=https://www.googleapis.com/compute/v1/projects/${{ secrets.GCP_PROJECT_ID }}/global/networks/my-vpc \
-            --subnet=https://www.googleapis.com/compute/v1/projects/${{ secrets.GCP_PROJECT_ID }}/regions/${{ secrets.REGION }}/subnetworks/webapp \
+            --network=https://www.googleapis.com/compute/v1/projects/${{ secrets.GCP_PROJECT_ID }}/global/networks/${{ secrets.VPC_NAME }} \
+            --subnet=https://www.googleapis.com/compute/v1/projects/${{ secrets.GCP_PROJECT_ID }}/regions/${{ secrets.REGION }}/subnetworks/${{ secrets.SUBNET_NAME}} \
             --description="my-template" \
-            --region=us-central1 \
+            --region us-central1 \
             --boot-disk-type=${{ secrets.BOOT_DISK_TYPE }} \
             --boot-disk-device-name=my-boot-disk \
             --boot-disk-size=${{ secrets.BOOT_DISK_SIZE }} \
-            --boot-disk-kms-key projects/tf-gcp-infra-414023/locations/us-central1/keyRings/my-key-ring-7/cryptoKeys/vm-cmek-key \
+            --boot-disk-kms-key projects/${{ secrets.GCP_PROJECT_ID }}/locations/${{ secrets.REGION }}/keyRings/${{ secrets.KEY_RING }}/cryptoKeys/${{ secrets.KEY}} \
             --metadata=startup-script="ENV_FILE=\"/opt/webapp/.env\"
 
           if [ ! -f \"\$ENV_FILE\" ]; then
