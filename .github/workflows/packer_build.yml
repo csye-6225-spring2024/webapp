@@ -139,17 +139,17 @@ jobs:
             # --boot-disk-interface=SCSI \
             # --format=json
 
-      - name: Update Managed Instance Group
-        run: |
-          # Update managed instance group with the new template
-          gloud compute instance-groups managed rolling-action replace my-instance-group --zone us-central1-a --replacement-method=recreate --new-instance-template=my-template
+      # - name: Update Managed Instance Group
+      #   run: |
+      #     # Update managed instance group with the new template
+      #     gloud compute instance-groups managed rolling-action replace my-instance-group --zone us-central1-a --replacement-method=recreate --new-instance-template=my-template
 
-      - name: Recreate Instances
-        run: |
-          # Recreate instances in the managed instance group
-          gcloud compute instance-groups managed recreate-instances my-instance-group --zone us-central1-a
+      # - name: Recreate Instances
+      #   run: |
+      #     # Recreate instances in the managed instance group
+      #     gcloud compute instance-groups managed recreate-instances my-instance-group --zone us-central1-a
 
-      - name: Wait for Instance Refresh
-        run: |
-          # Wait for instance group refresh to complete
-          gcloud compute instance-groups managed wait-until-stable my-instance-group --zone us-central1-a
+      # - name: Wait for Instance Refresh
+      #   run: |
+      #     # Wait for instance group refresh to complete
+      #     gcloud compute instance-groups managed wait-until-stable my-instance-group --zone us-central1-a
