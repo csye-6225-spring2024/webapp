@@ -101,24 +101,23 @@ jobs:
           TEMPLATE="webapp-template-$(date +%Y%m%d%H%M%S)"
 
           gcloud compute instance-templates create $TEMPLATE \
-            --machine-type=e2-medium \
+            --machine-type={{ secrets.MACHINE_TYPE }}\
             --image=$latest_image \
-            --network=https://www.googleapis.com/compute/v1/projects/tf-gcp-infra-414023/global/networks/my-vpc \
-            --subnet=https://www.googleapis.com/compute/v1/projects/tf-gcp-infra-414023/regions/us-central1/subnetworks/webapp \
+            --network=https://www.googleapis.com/compute/v1/projects/{{ secrets.GCP_PROJECT_ID }}/global/networks/${{ secrets.VPC_NAME }}  \
+            --subnet=https://www.googleapis.com/compute/v1/projects/{{ secrets.GCP_PROJECT_ID }}/regions/{{ secrets.REGION }}/subnetworks/${{ secrets.SUBNET_NAME}} \
             --description="my-template" \
-            --region us-central1 \
-            --instance-template-region=us-central1 \
-            --boot-disk-type=pd-balanced  \
+            --instance-template-region={{ secrets.REGION }} \
+            --boot-disk-type=${{ secrets.BOOT_DISK_TYPE }}  \
             --boot-disk-device-name=my-boot-disk \
-            --boot-disk-size=100GB  \
-            --boot-disk-kms-key projects/tf-gcp-infra-414023/locations/us-central1/keyRings/my-key-ring-8/cryptoKeys/vm-cmek-key \
+            --boot-disk-size=${{ secrets.BOOT_DISK_SIZE }}  \
+            --boot-disk-kms-key projects/{{ secrets.GCP_PROJECT_ID }}/locations/{{ secrets.REGION }}/keyRings/${{ secrets.KEY_RING }}/cryptoKeys/${{ secrets.KEY}}\
             --metadata=startup-script='#!/bin/bash
                     ENV_FILE="/opt/webapp/.env"
                     if [ ! -f "$ENV_FILE" ]; then
-                      echo "HOST=10.0.2.3" > /opt/webapp/.env
+                      echo "HOST={{ secrets.CHOST }}" > /opt/webapp/.env
                       echo "DB_PASSWORD=xXhhnwQbZ6j6Tr5E" >> /opt/webapp/.env
-                      echo "DB_USER=webapp" >> /opt/webapp/.env
-                      echo "DB=webapp" >> /opt/webapp/.env
+                      echo "DB_USER={{ secrets.CDB_USER }}" >> /opt/webapp/.env
+                      echo "DB={ secrets.CDB  }}" >> /opt/webapp/.env
                       echo "DIALECT=mysql" >> /opt/webapp/.env
                       echo "TOPIC_NAME=verify_email" >> /opt/webapp/.env
                       echo "LOGPATH=/var/log/webapp/app.log" >> /opt/webapp/.env
@@ -127,27 +126,19 @@ jobs:
                     fi
                     /opt/webapp/packer-config/configure_systemd.sh' \
             --tags=webapp \
-            --service-account=monitoring-service-account@tf-gcp-infra-414023.iam.gserviceaccount.com \
+            --service-account={{ secrets.SERVICE_ACCOUNT }}@{{ secrets.GCP_PROJECT_ID }}.iam.gserviceaccount.com \
             --scopes="cloud-platform"
 
       
 
       - name: Start Rolling Update
         run: |
-          gcloud compute instance-groups managed rolling-action start-update appserver-igm-1 \
-            --region=us-central1 \
-            --replacement-method=recreate \
-            --max-surge=0 \
-            --max-unavailable=1 \
-            --version=template=webapp-template-20240409234554
+          gcloud compute instance-groups managed rolling-action start-update {{ secrets.INSTANCE_TEMPLATE }} \
+            --version=template=projects/{{ secrets.GCP_PROJECT_ID }}/regions/{{ secrets.REGION }}/instanceTemplates/$TEMPLATE \
+            --region={{ secrets.REGION }} \
+            --type=proactive
 
-
-      # - name: Recreate Instances
-      #   run: |
-      #     # Recreate instances in the managed instance group
-      #     gcloud compute instance-groups managed recreate-instances my-instance-group --zone us-central1-a
-
-      # - name: Wait for Instance Refresh
-      #   run: |
-      #     # Wait for instance group refresh to complete
-      #     gcloud compute instance-groups managed wait-until-stable my-instance-group --zone us-central1-a
+      - name: Wait for Instance Refresh
+        run: |
+          # Wait for instance group refresh to complete
+          gcloud compute instance-groups managed wait-until-stable {{secrets.INSTANCE_TEMPLATE }} --region={{ secrets.REGION }}
