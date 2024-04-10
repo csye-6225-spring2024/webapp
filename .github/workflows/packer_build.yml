@@ -124,7 +124,6 @@ jobs:
                       echo "DB_USER=${{ secrets.CDB_USER }}" >> /opt/webapp/.env
                       echo "DB=${{ secrets.CDB  }}" >> /opt/webapp/.env
                       echo "DIALECT=mysql" >> /opt/webapp/.env
-                      echo "TOPIC_NAME=verify_email" >> /opt/webapp/.env
                       echo "LOGPATH=/var/log/webapp/app.log" >> /opt/webapp/.env
                     else
                       echo "$ENV_FILE file already exists."
