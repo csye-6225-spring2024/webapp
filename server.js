@@ -80,7 +80,7 @@ app.disable('x-powered-by');
 
 // Middleware to handle invalid methods for non-existent endpoints
 app.use('/', (req, res, next) => {
-  const allowedPaths = ['/v1/user', '/v1/user/self'];
+  const allowedPaths = ['/v2/user', '/v2/user/self'];
   if (allowedPaths.includes(req.path)) {
     next();
   } else {
@@ -100,7 +100,7 @@ app.use((error, req, res, next) => {
   }
 });
 
-app.use('/v1/user', router);
+app.use('/v2/user', router);
 
 // Synchronize the model with the database
 sequelize.sync().then(() => {
